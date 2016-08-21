@@ -12,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
+import com.hannesdorfmann.mosby.mvp.viewstate.RestorableParcelableViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
+import com.hannesdorfmann.mosby.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
 import java.util.List;
@@ -96,7 +98,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @NonNull
     @Override
-    public ViewState<StreamsView> createViewState() {
+    public LceViewState<List<Stream>, StreamsView> createViewState() {
+        RestorableParcelableViewState vs = (RestorableParcelableViewState) new RetainingLceViewState<>();
         return new RetainingLceViewState<List<Stream>, StreamsView>();
     }
 
