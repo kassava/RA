@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_default_height_material"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:colorControlNormal="@color/white"
+        >
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/searchEditView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search word ..."
+            android:textCursorDrawable="@drawable/text_cursor"
+            android:textSize="14sp"
+            app:met_baseColor="@color/white"
+            app:met_floatingLabel="none"
+            app:met_primaryColor="@color/white"
+            />
+
+
+    </android.support.v7.widget.Toolbar>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+        <include layout="@layout/merge_streams" />
+    </FrameLayout>
+</LinearLayout>

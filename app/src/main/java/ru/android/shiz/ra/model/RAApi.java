@@ -1,14 +1,12 @@
 package ru.android.shiz.ra.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ru.android.shiz.ra.model.stream.Stream;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Created by kassava on 09.05.2016.
