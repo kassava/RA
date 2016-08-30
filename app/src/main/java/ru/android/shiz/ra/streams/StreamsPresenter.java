@@ -20,6 +20,8 @@ import rx.schedulers.Schedulers;
  */
 public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
 
+    private final String LOG_TAG = StreamsPresenter.class.getSimpleName();
+
     Subscription subscription = null;
 
     private RAApi raApp;
@@ -30,9 +32,11 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
     }
 
     public void loadStreams(final boolean pullToRefresh) {
-        Log.d("Flow", "loadStreams(" + pullToRefresh + ")");
+        Log.d(LOG_TAG, "loadStreams(" + pullToRefresh + ")");
 
         if (isViewAttached()) {
+            Log.d(LOG_TAG, "isViewAttached");
+
             getView().showLoading(pullToRefresh);
         }
 
@@ -43,7 +47,7 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
                     @Override
                     public void onCompleted() {
                         if (isViewAttached()) {
-                            Log.d("Flow", "view.showContent()");
+                            Log.d(LOG_TAG, "view.showContent()!");
                             getView().showContent();
                         }
                     }
@@ -51,14 +55,14 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
                     @Override
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
-                            Log.d("Flow", "view.showError()");
+                            Log.d(LOG_TAG, "view.showError()");
                             getView().showError(e, pullToRefresh);
                         }
                     }
 
                     @Override
                     public void onNext(List<Stream> streams) {
-                        Log.d("Flow", "view.onNext()");
+                        Log.d(LOG_TAG, "view.onNext(): " + streams.size());
                         if (isViewAttached()) {
                             getView().setData(streams);
                         }
@@ -69,15 +73,15 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
     @Override
     public void attachView(StreamsView view) {
         super.attachView(view);
-        Log.d("Flow", "attaching View to " + this);
+        Log.d(LOG_TAG, "attaching View to " + this);
     }
 
     @Override
     public void detachView(boolean retainInstance) {
-        Log.d("Flow", "detaching View from " + this + " retained: " + retainInstance);
+        Log.d(LOG_TAG, "detaching View from " + this + " retained: " + retainInstance);
 
         super.detachView(retainInstance);
-        if (!retainInstance) {
+        if (!retainInstance && subscription != null) {
             subscription.unsubscribe();
         }
     }

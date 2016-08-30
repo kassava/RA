@@ -1,6 +1,8 @@
 package ru.android.shiz.ra.streams;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,7 +16,6 @@ import android.widget.Toast;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
-import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
 import java.util.List;
 
@@ -32,15 +33,15 @@ import ru.android.shiz.ra.streamdetails.StreamDetailsScreen;
 public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, StreamsPresenter> implements StreamsView,
         SwipeRefreshLayout.OnRefreshListener {
 
-    @Nullable @BindView(R.id.recyclerView) RecyclerView recyclerView;
-//    private RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+    private final String LOG_TAG = this.getClass().getSimpleName();
+
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.errorView) View errorView;
     @BindView(R.id.loadingView) View loadingView;
 
     private Context context;
     private boolean isRetainInstance;
-    private final String LOG_TAG = this.getClass().getSimpleName();
 
     private StreamsAdapter adapter;
 
@@ -51,8 +52,6 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         this.isRetainInstance = true;
 
         LayoutInflater.from(context).inflate(R.layout.recycler_swiperefresh_view, this, true);
-
-//        ButterKnife.bind(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         errorView = findViewById(R.id.errorView);
@@ -68,11 +67,9 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
                 }
         );
 
-        if (recyclerView == null) Log.d(LOG_TAG, "recyclerView null");
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        if (errorView == null) Log.d(LOG_TAG, "errorView null");
         errorView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,12 +94,16 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @NonNull
     @Override
     public ViewState<StreamsView> createViewState() {
-        return new RetainingLceViewState<List<Stream>, StreamsView>();
+        Log.d(LOG_TAG, "createViewState");
+
+        return new CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>();
     }
 
     @Override
     public void showLoading(boolean pullToRefresh) {
-//        castedViewState().setStateShowLoading(pullToRefresh);
+        Log.d(LOG_TAG, "showLoading");
+
+        castedViewState().setStateShowLoading(pullToRefresh);
 
         if (pullToRefresh) {
             loadingView.setVisibility(GONE);
@@ -121,9 +122,11 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void showContent() {
         castedViewState().setStateShowContent(adapter.getItems());
+
 
         if (isRetainInstance) {
             swipeRefreshLayout.setVisibility(VISIBLE);
@@ -133,10 +136,16 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
             swipeRefreshLayout.setAlpha(0f);
             swipeRefreshLayout.setVisibility(VISIBLE);
             swipeRefreshLayout.animate().alpha(1f).start();
-//            loadingView.animate().alpha(
-//                    0f).
-//                    withEndAction { loadingView.setVisibility(GONE); loadingView.setAlpha(1f); }
-//            .start();
+            loadingView.animate().alpha(0f).
+                    withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingView.setVisibility(GONE);
+                            loadingView.setAlpha(1f);
+                        }
+                    }
+
+            );
 
             errorView.setVisibility(GONE);
         }
@@ -163,6 +172,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void setData(List<Stream> data) {
+        Log.d(LOG_TAG, "data: " + data.size());
+
         adapter.setItems(data);
         adapter.notifyDataSetChanged();
     }
@@ -174,6 +185,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void onNewViewStateInstance() {
+        Log.d(LOG_TAG, "onNewViewStateInstance");
+
         loadData(false);
     }
 
@@ -182,7 +195,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         loadData(true);
     }
 
-    private RetainingLceViewState<List<Stream>, StreamsView> castedViewState() {
-        return (RetainingLceViewState<List<Stream>, StreamsView>)viewState;
+    private CustomRestorableParcelableLceViewState<List<Stream>, StreamsView> castedViewState() {
+        return (CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>)viewState;
     }
 }

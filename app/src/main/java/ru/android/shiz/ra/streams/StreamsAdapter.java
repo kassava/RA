@@ -1,10 +1,10 @@
 package ru.android.shiz.ra.streams;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +19,8 @@ import ru.android.shiz.ra.model.Stream;
  * Created by kassava on 09.05.2016.
  */
 public class StreamsAdapter extends RecyclerView.Adapter<StreamsAdapter.StreamViewHolder> {
+
+    private final String LOG_TAG = StreamsAdapter.class.getSimpleName();
 
     private List<Stream> items = null;
     private LayoutInflater inflater;
@@ -47,7 +49,7 @@ public class StreamsAdapter extends RecyclerView.Adapter<StreamsAdapter.StreamVi
     public void onBindViewHolder(StreamViewHolder holder, int position) {
         Stream stream = items.get(position);
         holder.stream = stream;
-        holder.name.setText((CharSequence) stream.getHeader());
+        holder.name.setText(stream.getHeader());
     }
 
     @Override
