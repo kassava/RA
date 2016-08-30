@@ -36,6 +36,8 @@ public class StreamsAdapter extends RecyclerView.Adapter<StreamsAdapter.StreamVi
     }
 
     public void setItems(List<Stream> items) {
+//        this.items.clear();
+//        this.items.addAll(items);
         this.items = items;
     }
 

@@ -88,6 +88,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public StreamsPresenter createPresenter() {
+        Log.d(LOG_TAG, "createPresenter");
+
         return RAApp.getComponent().streamsPresenter();
     }
 
@@ -97,6 +99,14 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         Log.d(LOG_TAG, "createViewState");
 
         return new CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>();
+    }
+
+
+    @Override
+    public void onNewViewStateInstance() {
+        Log.d(LOG_TAG, "onNewViewStateInstance");
+
+        loadData(false);
     }
 
     @Override
@@ -125,6 +135,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void showContent() {
+        Log.d(LOG_TAG, "showContent");
+
         castedViewState().setStateShowContent(adapter.getItems());
 
 
@@ -155,6 +167,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
+        Log.d(LOG_TAG, "showError");
+
         castedViewState().setStateShowError(e, pullToRefresh);
 
         if (pullToRefresh) {
@@ -172,7 +186,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void setData(List<Stream> data) {
-        Log.d(LOG_TAG, "data: " + data.size());
+        Log.d(LOG_TAG, "setData");
 
         adapter.setItems(data);
         adapter.notifyDataSetChanged();
@@ -180,18 +194,15 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void loadData(boolean pullToRefresh) {
+        Log.d(LOG_TAG, "loadData");
+
         presenter.loadStreams(pullToRefresh);
     }
 
     @Override
-    public void onNewViewStateInstance() {
-        Log.d(LOG_TAG, "onNewViewStateInstance");
-
-        loadData(false);
-    }
-
-    @Override
     public void onRefresh() {
+        Log.d(LOG_TAG, "onRefresh");
+
         loadData(true);
     }
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -14,7 +15,7 @@ import rx.functions.Func1;
 /**
  * Created by kassava on 09.05.2016.
  */
-public class RAApi {
+public class RaApi {
 
     private int requestCounter = 0;
     private int errorAfter = 3;
@@ -27,8 +28,24 @@ public class RAApi {
         }
     };
 
+    private Map<Integer, Stream> streamsMap2 = new HashMap<Integer, Stream>() {
+        {
+            put(0, new Stream(0, "Рипер"));
+            put(1, new Stream(1, "Глобал Хоук"));
+            put(2, new Stream(2, "Жнец"));
+        }
+    };
+
     public Observable<List<Stream>> getStreams() {
-        List<Stream> streams = new ArrayList(streamsMap.values());
+        Random random = new Random();
+        List<Stream> streams = null;
+        if (random.nextInt(2) == 1) {
+            streams = new ArrayList(streamsMap.values());
+        } else {
+            streams = new ArrayList(streamsMap2.values());
+        }
+
+
         return Observable.just(streams).delay(3, TimeUnit.SECONDS);
     }
 

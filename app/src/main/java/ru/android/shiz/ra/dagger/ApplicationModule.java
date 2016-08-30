@@ -4,7 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.android.shiz.ra.model.RAApi;
+import ru.android.shiz.ra.model.RaApi;
 
 /**
  * Created by kassava on 09.05.2016.
@@ -13,7 +13,7 @@ import ru.android.shiz.ra.model.RAApi;
 public class ApplicationModule {
 
     @Provides @Singleton
-    public RAApi provideRA() {
-        return new RAApi();
+    public RaApi provideRA() {
+        return new RaApi();
     }
 }

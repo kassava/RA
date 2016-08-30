@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ru.android.shiz.ra.model.RAApi;
+import ru.android.shiz.ra.model.RaApi;
 import ru.android.shiz.ra.model.Stream;
 import rx.Subscriber;
 import rx.Subscription;
@@ -24,10 +24,10 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
 
     Subscription subscription = null;
 
-    private RAApi raApp;
+    private RaApi raApp;
 
     @Inject
-    public StreamsPresenter(RAApi raApp) {
+    public StreamsPresenter(RaApi raApp) {
         this.raApp = raApp;
     }
 
