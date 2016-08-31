@@ -1,9 +1,11 @@
 package ru.android.shiz.ra.streams;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 import com.hannesdorfmann.mosby.mvp.viewstate.RestorableParcelableViewState;
@@ -17,8 +19,11 @@ import ru.android.shiz.ra.model.Stream;
 /**
  * Created by kassava on 30.08.16.
  */
+@SuppressLint("ParcelCreator")
 public class CustomRestorableParcelableLceViewState<D, V extends MvpLceView<D>> extends AbsLceViewState<D, V>
         implements RestorableParcelableViewState<V> {
+
+    private static final String LOG_TAG = CustomRestorableParcelableLceViewState.class.getSimpleName();
 
     public static final String KEY_BUNDLE_VIEW_STATE =
             "ru.android.shiz.ra.streams.ViewState.bundlekey";
@@ -60,11 +65,15 @@ public class CustomRestorableParcelableLceViewState<D, V extends MvpLceView<D>> 
 
     @Override
     public void saveInstanceState(@NonNull Bundle out) {
+        Log.d(LOG_TAG, "saveInstanceState");
+
         out.putParcelable(KEY_BUNDLE_VIEW_STATE, this);
     }
 
     @Override
     public RestorableViewState<V> restoreInstanceState(Bundle in) {
+        Log.d(LOG_TAG, "restoreInstanceState");
+
         if (in == null) {
             return null;
         }

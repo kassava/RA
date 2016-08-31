@@ -50,6 +50,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     public StreamsListLayout(Context ctx, AttributeSet attributeSet)  {
         super(ctx, attributeSet);
 
+        Log.d(LOG_TAG, "StreamsListLayout");
+
         this.context = ctx;
         this.isRetainInstance = true;
 
@@ -88,6 +90,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         ButterKnife.bind(this);
     }
 
+    @NonNull
     @Override
     public StreamsPresenter createPresenter() {
         Log.d(LOG_TAG, "createPresenter");
@@ -98,8 +101,11 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @NonNull
     @Override
     public ViewState<StreamsView> createViewState() {
-        Log.d(LOG_TAG, "createViewState");
+        Log.d(LOG_TAG, "createViewState: ");
 
+        if (isRestoringViewState()) {
+            Log.d(LOG_TAG, "isRestoringViewState");
+        }
         return new CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>();
     }
 
@@ -107,23 +113,20 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     public Parcelable onSaveInstanceState() {
         Log.d(LOG_TAG, "onSaveInstanceState:" + getViewState());
 
-        Parcelable state = super.onSaveInstanceState();
-        return state = getViewState();
+        return super.onSaveInstanceState();
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        Log.d(LOG_TAG, "onRestoreInstanceState: " + (ViewState)state);
+        Log.d(LOG_TAG, "onRestoreInstanceState: " + (CustomRestorableParcelableLceViewState)state);
 
         super.onRestoreInstanceState(state);
-        setViewState((ViewState) state);
     }
 
 
     @Override
     public void onNewViewStateInstance() {
         Log.d(LOG_TAG, "onNewViewStateInstance");
-
         Log.d(LOG_TAG, "getViewState(): " + getViewState());
 
         loadData(false);
@@ -161,10 +164,13 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
 
         if (isRestoringViewState()) {
+            Log.d(LOG_TAG, "showContent isRestoringViewState");
+
             swipeRefreshLayout.setVisibility(VISIBLE);
             errorView.setVisibility(GONE);
             loadingView.setVisibility(GONE);
         } else {
+            Log.d(LOG_TAG, "showContent isRestoringViewState else");
             swipeRefreshLayout.setAlpha(0f);
             swipeRefreshLayout.setVisibility(VISIBLE);
             swipeRefreshLayout.animate().alpha(1f).start();
