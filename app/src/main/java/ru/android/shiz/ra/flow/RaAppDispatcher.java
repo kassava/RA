@@ -21,12 +21,12 @@ import ru.android.shiz.ra.streams.StreamsScreen;
  *
  * Created by kassava on 24.04.2016.
  */
-final public class RAAppDispatcher implements Dispatcher {
+final public class RaAppDispatcher implements Dispatcher {
 
-    private final String LOG_TAG = RAAppDispatcher.class.getSimpleName();
+    private final String LOG_TAG = RaAppDispatcher.class.getSimpleName();
     private final Activity activity;
 
-    public RAAppDispatcher(Activity activity) {
+    public RaAppDispatcher(Activity activity) {
         this.activity = activity;
     }
 
@@ -38,12 +38,22 @@ final public class RAAppDispatcher implements Dispatcher {
         // Update container: remove oldView, insert newView
         ViewGroup frame = (ViewGroup) activity.findViewById(R.id.container);
 
-        // Remove current screen from container
+        Log.d(LOG_TAG, "getChildCount: " + frame.getChildCount());
+        Log.d(LOG_TAG, "traversal: " + traversal.origin);
+
+        // Remove current screen from container. Something is wrong in this method.
         if (traversal.origin != null) {
+            Log.d(LOG_TAG, "remove current screen from container");
+
             if (frame.getChildCount() > 0) {
                 traversal.getState(traversal.origin.top()).save(frame.getChildAt(0));
                 frame.removeAllViews();
             }
+        }
+
+        // This block is used for cleaning view from container.
+        if (frame.getChildCount() > 0) {
+            frame.removeAllViews();
         }
 
         @LayoutRes final int layout;

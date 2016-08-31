@@ -3,6 +3,8 @@ package ru.android.shiz.ra.streams;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -101,10 +103,28 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         return new CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>();
     }
 
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Log.d(LOG_TAG, "onSaveInstanceState:" + getViewState());
+
+        Parcelable state = super.onSaveInstanceState();
+        return state = getViewState();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        Log.d(LOG_TAG, "onRestoreInstanceState: " + (ViewState)state);
+
+        super.onRestoreInstanceState(state);
+        setViewState((ViewState) state);
+    }
+
 
     @Override
     public void onNewViewStateInstance() {
         Log.d(LOG_TAG, "onNewViewStateInstance");
+
+        Log.d(LOG_TAG, "getViewState(): " + getViewState());
 
         loadData(false);
     }
@@ -140,7 +160,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         castedViewState().setStateShowContent(adapter.getItems());
 
 
-        if (isRetainInstance) {
+        if (isRestoringViewState()) {
             swipeRefreshLayout.setVisibility(VISIBLE);
             errorView.setVisibility(GONE);
             loadingView.setVisibility(GONE);

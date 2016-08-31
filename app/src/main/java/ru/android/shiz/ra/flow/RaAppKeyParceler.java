@@ -10,7 +10,7 @@ import flow.KeyParceler;
  *
  * Created by kassava on 24.04.2016.
  */
-public final class RAAppKeyParceler implements KeyParceler {
+public final class RaAppKeyParceler implements KeyParceler {
 
     @NonNull @Override
     public Parcelable toParcelable(@NonNull Object key) {

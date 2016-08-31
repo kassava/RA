@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import flow.Flow;
-import ru.android.shiz.ra.flow.RAAppDispatcher;
-import ru.android.shiz.ra.flow.RAAppKeyParceler;
+import ru.android.shiz.ra.flow.RaAppDispatcher;
+import ru.android.shiz.ra.flow.RaAppKeyParceler;
 import ru.android.shiz.ra.streams.StreamsScreen;
 
 /**
@@ -23,9 +23,9 @@ public class BasicActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context baseContextWrapper) {
         baseContextWrapper = Flow.configure(baseContextWrapper, this)
-                .dispatcher(new RAAppDispatcher(this))
+                .dispatcher(new RaAppDispatcher(this))
                 .defaultKey(new StreamsScreen())
-                .keyParceler(new RAAppKeyParceler())
+                .keyParceler(new RaAppKeyParceler())
                 .install();
         super.attachBaseContext(baseContextWrapper);
     }

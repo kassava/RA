@@ -45,13 +45,6 @@ public class RaApi {
             streams = new ArrayList(streamsMap2.values());
         }
 
-
         return Observable.just(streams).delay(3, TimeUnit.SECONDS);
-    }
-
-    private void simulateNetworkTraffic() {
-        if (requestCounter++ % errorAfter == 0) {
-            throw new RuntimeException("Mocked Exception");
-        }
     }
 }
