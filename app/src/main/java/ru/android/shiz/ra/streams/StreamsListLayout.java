@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +13,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
+import com.hannesdorfmann.mosby.mvp.viewstate.layout.ViewStateSavedState;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @NonNull
     @Override
     public StreamsPresenter createPresenter() {
-        Log.d(LOG_TAG, "createPresenter");
+        Log.d(LOG_TAG, "createPresenter: " + RAApp.getComponent().streamsPresenter());
 
         return RAApp.getComponent().streamsPresenter();
     }
@@ -106,7 +107,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         if (isRestoringViewState()) {
             Log.d(LOG_TAG, "isRestoringViewState");
         }
-        return new CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>();
+        return new CustomRestorableParcelableViewState<List<Stream>, StreamsView>();
     }
 
     @Override
@@ -118,8 +119,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        Log.d(LOG_TAG, "onRestoreInstanceState: " + (CustomRestorableParcelableLceViewState)state);
-
+        ViewStateSavedState viewStateSavedState = (ViewStateSavedState) state;
+        Log.d(LOG_TAG, "onRestoreInstanceState: " + viewStateSavedState.getMosbyViewState());
         super.onRestoreInstanceState(state);
     }
 
@@ -232,7 +233,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         loadData(true);
     }
 
-    private CustomRestorableParcelableLceViewState<List<Stream>, StreamsView> castedViewState() {
-        return (CustomRestorableParcelableLceViewState<List<Stream>, StreamsView>)viewState;
+    private CustomRestorableParcelableViewState<List<Stream>, StreamsView> castedViewState() {
+        return (CustomRestorableParcelableViewState<List<Stream>, StreamsView>)viewState;
     }
 }
