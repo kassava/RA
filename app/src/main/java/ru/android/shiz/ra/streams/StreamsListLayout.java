@@ -27,6 +27,7 @@ import flow.Flow;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RAApp;
 import ru.android.shiz.ra.model.Stream;
+import ru.android.shiz.ra.mortar.MortarPresenter;
 import ru.android.shiz.ra.streamdetails.StreamDetailsScreen;
 
 /**
@@ -47,8 +48,13 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     private StreamsAdapter adapter;
 
+    private final MortarPresenter mortarPresenter;
+
     public StreamsListLayout(Context ctx, AttributeSet attributeSet)  {
         super(ctx, attributeSet);
+
+        // presenter for mortar
+        mortarPresenter = (MortarPresenter) ctx.getSystemService(MortarPresenter.class.getName());
 
         Log.d(LOG_TAG, "StreamsListLayout");
 
@@ -110,31 +116,30 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         return new CustomRestorableParcelableViewState<List<Stream>, StreamsView>();
     }
 
-    @SuppressLint("MissingSuperCall")
-    @Override
-    public Parcelable onSaveInstanceState() {
+//    @SuppressLint("MissingSuperCall")
+//    @Override
+//    public Parcelable onSaveInstanceState() {
 //        Parcelable state = super.onSaveInstanceState();
 //        Log.d(LOG_TAG, "onSaveInstanceState:" + super.onSaveInstanceState());
 //        state = getViewState();
 //        Log.d(LOG_TAG, "state: " + state);
 //        return state;
 
-        Parcelable superState = super.onSaveInstanceState();
-        return new SavedState(superState, castedViewState().getCurrentViewState());
-    }
+//        Log.d(LOG_TAG, "onSaveInstanceState");
+//        Parcelable superState = super.onSaveInstanceState();
+//        return new SavedState(superState, castedViewState().getCurrentViewState());
+//    }
 
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
+//    @Override
+//    public void onRestoreInstanceState(Parcelable state) {
 //        Log.d(LOG_TAG, "onRestoreInstanceState: " + state);
 //        viewState = (CustomRestorableParcelableViewState) state;
 //        super.onRestoreInstanceState(viewState);
-        SavedState savedState = (SavedState) state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-
-        Log.d(LOG_TAG, "SuperState:" + savedState.getState());
-
-
-    }
+//        SavedState savedState = (SavedState) state;
+//        super.onRestoreInstanceState(savedState.getSuperState());
+//
+//        Log.d(LOG_TAG, "SuperState:" + savedState.getState());
+//    }
 
     /**
      * Convenience class to save / restore the lock combination picker state. Looks clumsy
@@ -294,5 +299,21 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     private CustomRestorableParcelableViewState<List<Stream>, StreamsView> castedViewState() {
         return (CustomRestorableParcelableViewState<List<Stream>, StreamsView>)viewState;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        show("state");
+        mortarPresenter.dropView(this);
+        super.onDetachedFromWindow();
+    }
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mortarPresenter.takeView(this);
+    }
+
+    public void show(CharSequence stuff) {
+        mortarPresenter.setViewState((CustomRestorableParcelableViewState) getViewState());
     }
 }
