@@ -1,9 +1,10 @@
 package ru.android.shiz.ra.streams;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,12 +14,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
-import com.hannesdorfmann.mosby.mvp.viewstate.layout.ViewStateSavedState;
 
 import java.util.List;
 
@@ -102,7 +101,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @NonNull
     @Override
     public ViewState<StreamsView> createViewState() {
-        Log.d(LOG_TAG, "createViewState: ");
+        Log.d(LOG_TAG, "createViewState: " + getViewState());
+
 
         if (isRestoringViewState()) {
             Log.d(LOG_TAG, "isRestoringViewState");
@@ -110,18 +110,77 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         return new CustomRestorableParcelableViewState<List<Stream>, StreamsView>();
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public Parcelable onSaveInstanceState() {
-        Log.d(LOG_TAG, "onSaveInstanceState:" + getViewState());
+//        Parcelable state = super.onSaveInstanceState();
+//        Log.d(LOG_TAG, "onSaveInstanceState:" + super.onSaveInstanceState());
+//        state = getViewState();
+//        Log.d(LOG_TAG, "state: " + state);
+//        return state;
 
-        return super.onSaveInstanceState();
+        Parcelable superState = super.onSaveInstanceState();
+        return new SavedState(superState, castedViewState().getCurrentViewState());
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        ViewStateSavedState viewStateSavedState = (ViewStateSavedState) state;
-        Log.d(LOG_TAG, "onRestoreInstanceState: " + viewStateSavedState.getMosbyViewState());
-        super.onRestoreInstanceState(state);
+//        Log.d(LOG_TAG, "onRestoreInstanceState: " + state);
+//        viewState = (CustomRestorableParcelableViewState) state;
+//        super.onRestoreInstanceState(viewState);
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+
+        Log.d(LOG_TAG, "SuperState:" + savedState.getState());
+
+
+    }
+
+    /**
+     * Convenience class to save / restore the lock combination picker state. Looks clumsy
+     * but once created is easy to maintain and use.
+     */
+    protected static class SavedState extends BaseSavedState {
+
+        private final int state;
+
+        private SavedState(Parcelable superState, int state) {
+            super(superState);
+            this.state = state;
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            state = in.readInt();
+        }
+
+        public int getState() {
+            return state;
+        }
+
+        @Override
+        public void writeToParcel(Parcel destination, int flags) {
+            super.writeToParcel(destination, flags);
+            destination.writeInt(state);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
+
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+    }
+
+
+    @Override
+    public void onViewStateInstanceRestored(boolean instanceStateRetained) {
+        // can be overridden in subclass
+        Log.d(LOG_TAG, "onViewStateInstanceRestored: " + instanceStateRetained);
     }
 
 

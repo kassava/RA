@@ -50,6 +50,10 @@ public class CustomRestorableParcelableViewState<D, V extends MvpLceView<D>>
         return 0;
     }
 
+    public int getCurrentViewState() {
+        return currentViewState;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(currentViewState);
@@ -80,12 +84,13 @@ public class CustomRestorableParcelableViewState<D, V extends MvpLceView<D>>
 
     @Override
     public void saveInstanceState(@NonNull Bundle out) {
+        Log.d(LOG_TAG, "saveInstanceState: " + out);
 
     }
 
     @Override
     public RestorableViewState<V> restoreInstanceState(Bundle in) {
-        Log.d(LOG_TAG, "restoreInstanceState");
+        Log.d(LOG_TAG, "restoreInstanceState: " + in);
 
         if (in == null) {
             return null;
