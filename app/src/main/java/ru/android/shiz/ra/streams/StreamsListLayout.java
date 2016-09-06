@@ -44,7 +44,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @BindView(R.id.loadingView) View loadingView;
 
     private Context context;
-    private boolean isRetainInstance;
+    private boolean isRetainInstance = false;
 
     private StreamsAdapter adapter;
 
@@ -116,72 +116,6 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         return new CustomRestorableParcelableViewState<List<Stream>, StreamsView>();
     }
 
-//    @SuppressLint("MissingSuperCall")
-//    @Override
-//    public Parcelable onSaveInstanceState() {
-//        Parcelable state = super.onSaveInstanceState();
-//        Log.d(LOG_TAG, "onSaveInstanceState:" + super.onSaveInstanceState());
-//        state = getViewState();
-//        Log.d(LOG_TAG, "state: " + state);
-//        return state;
-
-//        Log.d(LOG_TAG, "onSaveInstanceState");
-//        Parcelable superState = super.onSaveInstanceState();
-//        return new SavedState(superState, castedViewState().getCurrentViewState());
-//    }
-
-//    @Override
-//    public void onRestoreInstanceState(Parcelable state) {
-//        Log.d(LOG_TAG, "onRestoreInstanceState: " + state);
-//        viewState = (CustomRestorableParcelableViewState) state;
-//        super.onRestoreInstanceState(viewState);
-//        SavedState savedState = (SavedState) state;
-//        super.onRestoreInstanceState(savedState.getSuperState());
-//
-//        Log.d(LOG_TAG, "SuperState:" + savedState.getState());
-//    }
-
-    /**
-     * Convenience class to save / restore the lock combination picker state. Looks clumsy
-     * but once created is easy to maintain and use.
-     */
-    protected static class SavedState extends BaseSavedState {
-
-        private final int state;
-
-        private SavedState(Parcelable superState, int state) {
-            super(superState);
-            this.state = state;
-        }
-
-        private SavedState(Parcel in) {
-            super(in);
-            state = in.readInt();
-        }
-
-        public int getState() {
-            return state;
-        }
-
-        @Override
-        public void writeToParcel(Parcel destination, int flags) {
-            super.writeToParcel(destination, flags);
-            destination.writeInt(state);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
-
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-    }
-
-
     @Override
     public void onViewStateInstanceRestored(boolean instanceStateRetained) {
         // can be overridden in subclass
@@ -191,8 +125,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     public void onNewViewStateInstance() {
-        Log.d(LOG_TAG, "onNewViewStateInstance");
-        Log.d(LOG_TAG, "getViewState(): " + getViewState());
+        Log.d(LOG_TAG, "onNewViewStateInstance"  + getViewState());
 
         loadData(false);
     }
@@ -303,17 +236,24 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @Override
     protected void onDetachedFromWindow() {
-        show("state");
+        Log.d(LOG_TAG, "onDetachedFromWindow");
+        mortarPresenter.setViewState((CustomRestorableParcelableViewState) getViewState());
         mortarPresenter.dropView(this);
         super.onDetachedFromWindow();
     }
 
-    @Override protected void onAttachedToWindow() {
+    @Override
+    protected void onAttachedToWindow() {
+        Log.d(LOG_TAG, "onAttachedFromWindow: " + viewState);
+        if (mortarPresenter.getViewState() != null) {
+            isRetainInstance = true;
+        } else {
+            isRetainInstance = false;
+        }
+        if (isRetainInstance) {
+            viewState = mortarPresenter.getViewState();
+        }
         super.onAttachedToWindow();
         mortarPresenter.takeView(this);
-    }
-
-    public void show(CharSequence stuff) {
-        mortarPresenter.setViewState((CustomRestorableParcelableViewState) getViewState());
     }
 }

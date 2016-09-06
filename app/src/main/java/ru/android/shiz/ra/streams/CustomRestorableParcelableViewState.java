@@ -98,7 +98,7 @@ public class CustomRestorableParcelableViewState<D, V extends MvpLceView<D>>
 
         // Workaround to solve class loader problem.
         // But it returns a copy of the view state and not this viewstate. However, that's ok!
-        return (CustomRestorableParcelableLceViewState<D, V>) in.getParcelable(KEY_BUNDLE_VIEW_STATE);
+        return (CustomRestorableParcelableViewState<D, V>) in.getParcelable(KEY_BUNDLE_VIEW_STATE);
     }
 
     @Override

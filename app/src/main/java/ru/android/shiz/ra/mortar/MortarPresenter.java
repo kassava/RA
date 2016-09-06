@@ -3,14 +3,10 @@ package ru.android.shiz.ra.mortar;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import mortar.ViewPresenter;
-import ru.android.shiz.ra.streams.CustomRestorableParcelableLceViewState;
 import ru.android.shiz.ra.streams.CustomRestorableParcelableViewState;
 import ru.android.shiz.ra.streams.StreamsListLayout;
 
@@ -28,7 +24,9 @@ public class MortarPresenter extends ViewPresenter<StreamsListLayout> {
         if (savedInstanceState != null && serial == -1) serial = savedInstanceState.getInt("serial");
 
 //        getView().show("Update #" + ++serial + " at " + format.format(new Date()) + " --- ");
-        Log.d("mortar", "state: " + savedInstanceState.getParcelable("view_state"));
+        if (savedInstanceState != null) {
+            Log.d("mortar", "state: " + savedInstanceState.getParcelable("view_state"));
+        }
     }
 
     @Override
@@ -39,5 +37,9 @@ public class MortarPresenter extends ViewPresenter<StreamsListLayout> {
 
     public void setViewState(CustomRestorableParcelableViewState viewState) {
         this.viewState = viewState;
+    }
+
+    public CustomRestorableParcelableViewState getViewState() {
+        return viewState;
     }
 }
