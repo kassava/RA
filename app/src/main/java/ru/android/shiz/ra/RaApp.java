@@ -8,7 +8,7 @@ import ru.android.shiz.ra.dagger.ApplicationComponent;
 /**
  * Created by kassava on 10.05.2016.
  */
-public class RAApp extends Application {
+public class RaApp extends Application {
 
     private static ApplicationComponent component;
     private MortarScope rootScope;
@@ -19,7 +19,8 @@ public class RAApp extends Application {
         component = ru.android.shiz.ra.dagger.DaggerApplicationComponent.create();
     }
 
-    @Override public Object getSystemService(String name) {
+    @Override
+    public Object getSystemService(String name) {
         if (rootScope == null) rootScope = MortarScope.buildRootScope().build("Root");
 
         return rootScope.hasService(name) ? rootScope.getService(name) : super.getSystemService(name);

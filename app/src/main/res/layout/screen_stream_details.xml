@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.android.shiz.ra.StreamDetailsLayout
+<ru.android.shiz.ra.streamdetails.StreamDetailsLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/screenStreamDetails"
@@ -81,4 +81,4 @@
             />
 
     </android.support.design.widget.CoordinatorLayout>
-</ru.android.shiz.ra.StreamDetailsLayout>
+</ru.android.shiz.ra.streamdetails.StreamDetailsLayout>

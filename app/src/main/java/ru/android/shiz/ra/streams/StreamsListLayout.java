@@ -1,11 +1,8 @@
 package ru.android.shiz.ra.streams;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import flow.Flow;
 import ru.android.shiz.ra.R;
-import ru.android.shiz.ra.RAApp;
+import ru.android.shiz.ra.RaApp;
 import ru.android.shiz.ra.model.Stream;
 import ru.android.shiz.ra.mortar.MortarPresenter;
 import ru.android.shiz.ra.streamdetails.StreamDetailsScreen;
@@ -99,16 +96,15 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     @NonNull
     @Override
     public StreamsPresenter createPresenter() {
-        Log.d(LOG_TAG, "createPresenter: " + RAApp.getComponent().streamsPresenter());
+        Log.d(LOG_TAG, "createPresenter: " + RaApp.getComponent().streamsPresenter());
 
-        return RAApp.getComponent().streamsPresenter();
+        return RaApp.getComponent().streamsPresenter();
     }
 
     @NonNull
     @Override
     public ViewState<StreamsView> createViewState() {
         Log.d(LOG_TAG, "createViewState: " + getViewState());
-
 
         if (isRestoringViewState()) {
             Log.d(LOG_TAG, "isRestoringViewState");

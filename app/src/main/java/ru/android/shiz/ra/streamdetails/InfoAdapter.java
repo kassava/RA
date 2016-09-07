@@ -36,10 +36,10 @@ public class InfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         RecyclerView.ViewHolder viewHolder = null;
         switch(viewType) {
             case VIEWTYPE_IMAGE:
-                viewHolder = InfoPictureViewHolder(inflater.inflate(R.layout.item_picture, parent, false));
+                viewHolder = new InfoPictureViewHolder(inflater.inflate(R.layout.item_picture, parent, false));
                 break;
             case VIEWTYPE_TEXT:
-                viewHolder = InfoViewHolder(inflater.inflate(R.layout.item_info, parent, false));
+                viewHolder = new InfoViewHolder(inflater.inflate(R.layout.item_info, parent, false));
                 break;
             default:
 //                throw new Exception("unkonown viewholder");
@@ -52,8 +52,8 @@ public class InfoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof InfoViewHolder) {
             InfoText info = (InfoText) items.get(position);
-            holder.title.setText(info.getTitleRes());
-            holder.text.setText(info.getText());
+            ((InfoViewHolder) holder).title.setText(info.getTitleRes());
+            ((InfoViewHolder) holder).text.setText(info.getText());
         } else {
             if (holder instanceof InfoPictureViewHolder) {
                 InfoPicture info = (InfoPicture) items.get(position);

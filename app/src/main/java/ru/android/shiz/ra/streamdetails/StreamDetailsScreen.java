@@ -8,6 +8,10 @@ import android.os.Parcelable;
  */
 public class StreamDetailsScreen implements Parcelable {
 
+    public int getStreamId() {
+        return streamId;
+    }
+
     private int streamId;
 
     public StreamDetailsScreen(int streamId) {

@@ -39,6 +39,15 @@ public class StreamDetail implements Parcelable {
         this.imageUrl = header;
     }
 
+
+    public List<Info> getInfos() {
+        return infos;
+    }
+
+    public void setInfos(List<Info> infos) {
+        this.infos = infos;
+    }
+
     protected StreamDetail(Parcel in) {
     }
 

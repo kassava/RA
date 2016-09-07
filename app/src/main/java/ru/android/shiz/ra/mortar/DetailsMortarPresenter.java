@@ -5,16 +5,15 @@ import android.util.Log;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
 
-import javax.inject.Singleton;
-
 import mortar.ViewPresenter;
+import ru.android.shiz.ra.streamdetails.StreamDetailsLayout;
+import ru.android.shiz.ra.streamdetails.StreamsDetailsView;
 import ru.android.shiz.ra.streams.CustomRestorableParcelableViewState;
-import ru.android.shiz.ra.streams.StreamsListLayout;
 
 /**
- * Created by kassava on 05.09.2016.
+ * Created by kassava on 07.09.16.
  */
-public class MortarPresenter extends ViewPresenter<StreamsListLayout> {
+public class DetailsMortarPresenter extends ViewPresenter<StreamDetailsLayout> {
 
     private CustomRestorableParcelableViewState viewState;
 

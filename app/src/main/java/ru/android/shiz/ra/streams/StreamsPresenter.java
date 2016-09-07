@@ -35,8 +35,6 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
         Log.d(LOG_TAG, "loadStreams(" + pullToRefresh + ")");
 
         if (isViewAttached()) {
-            Log.d(LOG_TAG, "isViewAttached");
-
             getView().showLoading(pullToRefresh);
         }
 

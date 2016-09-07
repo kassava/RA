@@ -27,7 +27,7 @@ public class BasicActivity extends AppCompatActivity {
         if (activityScope == null) {
             activityScope = buildChild(getApplicationContext()) //
                     .withService(BundleServiceRunner.SERVICE_NAME, new BundleServiceRunner())
-                    .withService(MortarPresenter.class.getName(), new MortarPresenter())
+//                    .withService(MortarPresenter.class.getName(), new MortarPresenter())
                     .build(getScopeName());
         }
         return activityScope.hasService(name) ? activityScope.getService(name)

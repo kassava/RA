@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import ru.android.shiz.ra.R;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -46,5 +47,16 @@ public class RaApi {
         }
 
         return Observable.just(streams).delay(3, TimeUnit.SECONDS);
+    }
+
+    public Observable<StreamDetail> getDetails(int id) {
+        Stream stream = streamsMap.get(id);
+        List<StreamDetail> details = new ArrayList<>();
+        List<Info> infoList = new ArrayList<>();
+        infoList.add(new InfoText(R.string.app_name,"Тренировочный полёт."));
+        infoList.add(new InfoText(R.string.app_name, "Ирак"));
+        StreamDetail streamDetail = new StreamDetail(id, "url", infoList);
+        details.add(streamDetail);
+        return Observable.just(streamDetail).delay(2, TimeUnit.SECONDS);
     }
 }
