@@ -1,5 +1,7 @@
 package ru.android.shiz.ra.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +19,8 @@ import rx.functions.Func1;
  * Created by kassava on 09.05.2016.
  */
 public class RaApi {
+
+    private final String LOG_TAG = RaApi.class.getSimpleName();
 
     private int requestCounter = 0;
     private int errorAfter = 3;
@@ -50,11 +54,26 @@ public class RaApi {
     }
 
     public Observable<StreamDetail> getDetails(int id) {
+        Log.d(LOG_TAG, "id: " + id);
+
         Stream stream = streamsMap.get(id);
         List<StreamDetail> details = new ArrayList<>();
         List<Info> infoList = new ArrayList<>();
-        infoList.add(new InfoText(R.string.app_name,"Тренировочный полёт."));
-        infoList.add(new InfoText(R.string.app_name, "Ирак"));
+        switch (id) {
+            case 0:
+                infoList.add(new InfoText(R.string.app_name,"Тренировочный полёт."));
+                infoList.add(new InfoText(R.string.app_name, "Ирак"));
+                break;
+            case 1:
+                infoList.add(new InfoText(R.string.app_name,"За Бен Ладоном."));
+                infoList.add(new InfoText(R.string.app_name, "Афганистан"));
+                break;
+            default:
+                infoList.add(new InfoText(R.string.app_name,"Домой."));
+                infoList.add(new InfoText(R.string.app_name, "США"));
+                break;
+        }
+
         StreamDetail streamDetail = new StreamDetail(id, "url", infoList);
         details.add(streamDetail);
         return Observable.just(streamDetail).delay(2, TimeUnit.SECONDS);

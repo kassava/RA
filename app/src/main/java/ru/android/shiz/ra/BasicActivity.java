@@ -1,6 +1,7 @@
 package ru.android.shiz.ra;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -9,6 +10,7 @@ import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
 import ru.android.shiz.ra.flow.RaAppDispatcher;
 import ru.android.shiz.ra.flow.RaAppKeyParceler;
+import ru.android.shiz.ra.mortar.DetailsMortarPresenter;
 import ru.android.shiz.ra.mortar.MortarPresenter;
 import ru.android.shiz.ra.streams.StreamsScreen;
 
@@ -20,14 +22,17 @@ import static mortar.MortarScope.findChild;
  */
 public class BasicActivity extends AppCompatActivity {
 
+    private MortarScope activityScope;
+
     @Override
     public Object getSystemService(String name) {
         MortarScope activityScope = findChild(getApplicationContext(), getScopeName());
 
         if (activityScope == null) {
-            activityScope = buildChild(getApplicationContext()) //
+            activityScope = buildChild(getApplicationContext())
                     .withService(BundleServiceRunner.SERVICE_NAME, new BundleServiceRunner())
-//                    .withService(MortarPresenter.class.getName(), new MortarPresenter())
+                    .withService(MortarPresenter.class.getName(), new MortarPresenter())
+                    .withService(DetailsMortarPresenter.class.getName(), new DetailsMortarPresenter())
                     .build(getScopeName());
         }
         return activityScope.hasService(name) ? activityScope.getService(name)
@@ -39,6 +44,20 @@ public class BasicActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState);
+
+        // from Mortar git sample.
+//        MortarScope parentScope = MortarScope.getScope(getApplication());
+//        String scopeName = getLocalClassName() + "-task-" + getTaskId();
+//
+//        activityScope = parentScope.findChild(scopeName);
+//        if (activityScope == null) {
+//            activityScope = parentScope.buildChild()
+//                    .withService(BundleServiceRunner.SERVICE_NAME, new BundleServiceRunner())
+//                    .build(scopeName);
+//        }
+//
+//        BundleServiceRunner.getBundleServiceRunner(activityScope).onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_basic);
     }
 
@@ -74,6 +93,6 @@ public class BasicActivity extends AppCompatActivity {
     }
 
     private String getScopeName() {
-        return getClass().getName();
+        return getClass().getName() + "-task-" + getTaskId();
     }
 }

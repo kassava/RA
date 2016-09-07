@@ -7,7 +7,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +28,6 @@ import ru.android.shiz.ra.RaApp;
 import ru.android.shiz.ra.model.InfoText;
 import ru.android.shiz.ra.model.StreamDetail;
 import ru.android.shiz.ra.mortar.DetailsMortarPresenter;
-import ru.android.shiz.ra.mortar.MortarPresenter;
 import ru.android.shiz.ra.streams.CustomRestorableParcelableViewState;
 import ru.android.shiz.ra.streams.StreamsListLayout;
 
@@ -49,11 +47,9 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
     @BindView(R.id.collapsingToolbar) CollapsingToolbarLayout collapsingToolbar;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    private StreamDetailsScreen streamDetailsScreen;
     private int streamId;
 
     private DetailsMortarPresenter mortarPresenter;
-    private boolean isRetainInstance = false;
 
     private Context context;
 
@@ -69,18 +65,15 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
 
     @Override
     protected void onAttachedToWindow() {
-        if (mortarPresenter.getViewState() != null) {
-            isRetainInstance = true;
-        } else {
-            isRetainInstance = false;
-        }
+        boolean isRetainInstance;
+        isRetainInstance = mortarPresenter.getViewState() != null;
         if (isRetainInstance) {
             viewState = mortarPresenter.getViewState();
         }
+        StreamDetailsScreen streamDetailsScreen = Flow.getKey(this);
+        streamId = streamDetailsScreen != null ? streamDetailsScreen.getStreamId() : 0;
         super.onAttachedToWindow();
         mortarPresenter.takeView(this);
-        streamDetailsScreen = Flow.getKey(this);
-        streamId = streamDetailsScreen.getStreamId();
     }
 
     @Override
@@ -101,6 +94,7 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
             @Override
             public void onClick(View v) {
                 Flow.get(context).goBack();
+                castedViewState().setStateShowLoading(false);
             }
         });
         hilightImage.setColorFilter(new PorterDuffColorFilter(
@@ -126,6 +120,7 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
         recyclerView.setLayoutManager(layoutManager);
     }
 
+    @NonNull
     @Override
     public StreamDetailsPresenter createPresenter() {
         return RaApp.getComponent().streamDetailsPresenter();

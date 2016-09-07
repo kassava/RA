@@ -69,7 +69,10 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Flow.get(getContext()).set(new StreamDetailsScreen(v.getId()));
+                        Log.d(LOG_TAG, "onClick: " + recyclerView.getChildLayoutPosition(v));
+
+//                        Flow.get(getContext()).set(new StreamDetailsScreen(v.getId()));
+                        Flow.get(getContext()).set(new StreamDetailsScreen(recyclerView.getChildLayoutPosition(v)));
                     }
                 }
         );
