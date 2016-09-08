@@ -1,7 +1,6 @@
 package ru.android.shiz.ra;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -12,7 +11,7 @@ import ru.android.shiz.ra.flow.RaAppDispatcher;
 import ru.android.shiz.ra.flow.RaAppKeyParceler;
 import ru.android.shiz.ra.mortar.DetailsMortarPresenter;
 import ru.android.shiz.ra.mortar.MortarPresenter;
-import ru.android.shiz.ra.streams.StreamsScreen;
+import ru.android.shiz.ra.broadcasts.BroadcastsScreen;
 
 import static mortar.MortarScope.buildChild;
 import static mortar.MortarScope.findChild;
@@ -79,7 +78,7 @@ public class BasicActivity extends AppCompatActivity {
     protected void attachBaseContext(Context baseContextWrapper) {
         baseContextWrapper = Flow.configure(baseContextWrapper, this)
                 .dispatcher(new RaAppDispatcher(this))
-                .defaultKey(new StreamsScreen())
+                .defaultKey(new BroadcastsScreen())
                 .keyParceler(new RaAppKeyParceler())
                 .install();
         super.attachBaseContext(baseContextWrapper);

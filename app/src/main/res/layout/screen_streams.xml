@@ -25,7 +25,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ru.android.shiz.ra.streams.StreamsListLayout
+    <ru.android.shiz.ra.broadcasts.BroadcastsListLayout
         android:id="@+id/streamsScreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

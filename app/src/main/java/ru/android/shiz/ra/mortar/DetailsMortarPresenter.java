@@ -3,17 +3,14 @@ package ru.android.shiz.ra.mortar;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.hannesdorfmann.mosby.mvp.viewstate.layout.MvpViewStateFrameLayout;
-
 import mortar.ViewPresenter;
-import ru.android.shiz.ra.streamdetails.StreamDetailsLayout;
-import ru.android.shiz.ra.streamdetails.StreamsDetailsView;
-import ru.android.shiz.ra.streams.CustomRestorableParcelableViewState;
+import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsLayout;
+import ru.android.shiz.ra.base.viewstate.CustomRestorableParcelableViewState;
 
 /**
  * Created by kassava on 07.09.16.
  */
-public class DetailsMortarPresenter extends ViewPresenter<StreamDetailsLayout> {
+public class DetailsMortarPresenter extends ViewPresenter<BroadcastDetailsLayout> {
 
     private CustomRestorableParcelableViewState viewState;
 

@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streams;
+package ru.android.shiz.ra.base.viewstate;
 
 import android.os.Bundle;
 import android.os.Parcel;

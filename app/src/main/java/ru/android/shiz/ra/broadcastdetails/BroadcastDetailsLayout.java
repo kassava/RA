@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streamdetails;
+package ru.android.shiz.ra.broadcastdetails;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -28,16 +28,16 @@ import ru.android.shiz.ra.RaApp;
 import ru.android.shiz.ra.model.InfoText;
 import ru.android.shiz.ra.model.StreamDetail;
 import ru.android.shiz.ra.mortar.DetailsMortarPresenter;
-import ru.android.shiz.ra.streams.CustomRestorableParcelableViewState;
-import ru.android.shiz.ra.streams.StreamsListLayout;
+import ru.android.shiz.ra.base.viewstate.CustomRestorableParcelableViewState;
+import ru.android.shiz.ra.broadcasts.BroadcastsListLayout;
 
 /**
  * Created by kassava on 07.09.16.
  */
-public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsView, StreamDetailsPresenter>
-        implements StreamsDetailsView {
+public class BroadcastDetailsLayout extends MvpViewStateFrameLayout<BroadcastDetailsView, BroadcastDetailsPresenter>
+        implements BroadcastDetailsView {
 
-    private final String LOG_TAG = StreamsListLayout.class.getSimpleName();
+    private final String LOG_TAG = BroadcastsListLayout.class.getSimpleName();
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.contentView) View contentView;
@@ -56,7 +56,7 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
     private StreamDetail detailData = null;
     private InfoAdapter adapter;
 
-    public StreamDetailsLayout(Context ctx, AttributeSet attributeSet) {
+    public BroadcastDetailsLayout(Context ctx, AttributeSet attributeSet) {
         super(ctx, attributeSet);
         this.context = ctx;
         adapter = new InfoAdapter(LayoutInflater.from(context));
@@ -70,8 +70,8 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
         if (isRetainInstance) {
             viewState = mortarPresenter.getViewState();
         }
-        StreamDetailsScreen streamDetailsScreen = Flow.getKey(this);
-        streamId = streamDetailsScreen != null ? streamDetailsScreen.getStreamId() : 0;
+        BroadcastDetailsScreen broadcastDetailsScreen = Flow.getKey(this);
+        streamId = broadcastDetailsScreen != null ? broadcastDetailsScreen.getStreamId() : 0;
         super.onAttachedToWindow();
         mortarPresenter.takeView(this);
     }
@@ -122,15 +122,15 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
 
     @NonNull
     @Override
-    public StreamDetailsPresenter createPresenter() {
+    public BroadcastDetailsPresenter createPresenter() {
         return RaApp.getComponent().streamDetailsPresenter();
     }
 
 
     @NonNull
     @Override
-    public ViewState<StreamsDetailsView> createViewState() {
-        return new CustomRestorableParcelableViewState<StreamDetail, StreamsDetailsView>();
+    public ViewState<BroadcastDetailsView> createViewState() {
+        return new CustomRestorableParcelableViewState<StreamDetail, BroadcastDetailsView>();
     }
 
     @Override
@@ -207,7 +207,7 @@ public class StreamDetailsLayout extends MvpViewStateFrameLayout<StreamsDetailsV
         presenter.loadDetails(streamId);
     }
 
-    private CustomRestorableParcelableViewState<StreamDetail, StreamsDetailsView> castedViewState() {
-        return (CustomRestorableParcelableViewState<StreamDetail, StreamsDetailsView>)viewState;
+    private CustomRestorableParcelableViewState<StreamDetail, BroadcastDetailsView> castedViewState() {
+        return (CustomRestorableParcelableViewState<StreamDetail, BroadcastDetailsView>)viewState;
     }
 }

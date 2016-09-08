@@ -1,7 +1,6 @@
-package ru.android.shiz.ra.streams;
+package ru.android.shiz.ra.broadcasts;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +17,15 @@ import ru.android.shiz.ra.model.Stream;
 /**
  * Created by kassava on 09.05.2016.
  */
-public class StreamsAdapter extends RecyclerView.Adapter<StreamsAdapter.StreamViewHolder> {
+public class BroadcastsAdapter extends RecyclerView.Adapter<BroadcastsAdapter.StreamViewHolder> {
 
-    private final String LOG_TAG = StreamsAdapter.class.getSimpleName();
+    private final String LOG_TAG = BroadcastsAdapter.class.getSimpleName();
 
     private List<Stream> items = null;
     private LayoutInflater inflater;
     private View.OnClickListener onItemClickListener;
 
-    public StreamsAdapter(LayoutInflater inflater, View.OnClickListener onItemClickListener) {
+    public BroadcastsAdapter(LayoutInflater inflater, View.OnClickListener onItemClickListener) {
         this.inflater = inflater;
         this.onItemClickListener = onItemClickListener;
     }

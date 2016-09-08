@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streamdetails;
+package ru.android.shiz.ra.broadcastdetails;
 
 import android.util.Log;
 
@@ -16,15 +16,15 @@ import rx.schedulers.Schedulers;
 /**
  * Created by kassava on 06.09.16.
  */
-public class StreamDetailsPresenter extends MvpBasePresenter<StreamsDetailsView> {
+public class BroadcastDetailsPresenter extends MvpBasePresenter<BroadcastDetailsView> {
 
-    private final String LOG_TAG = StreamDetailsPresenter.class.getSimpleName();
+    private final String LOG_TAG = BroadcastDetailsPresenter.class.getSimpleName();
 
     Subscription subscription = null;
     private RaApi raApi;
 
     @Inject
-    public StreamDetailsPresenter(RaApi raApi) {
+    public BroadcastDetailsPresenter(RaApi raApi) {
         this.raApi = raApi;
     }
 
@@ -66,7 +66,7 @@ public class StreamDetailsPresenter extends MvpBasePresenter<StreamsDetailsView>
     }
 
     @Override
-    public void attachView(StreamsDetailsView view) {
+    public void attachView(BroadcastDetailsView view) {
         super.attachView(view);
         Log.d(LOG_TAG, "attaching View to " + this);
     }

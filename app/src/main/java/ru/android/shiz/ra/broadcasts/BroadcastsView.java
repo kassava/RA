@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streams;
+package ru.android.shiz.ra.broadcasts;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 
@@ -9,5 +9,5 @@ import ru.android.shiz.ra.model.Stream;
 /**
  * Created by kassava on 28.04.2016.
  */
-public interface StreamsView extends MvpLceView<List<Stream>> {
+public interface BroadcastsView extends MvpLceView<List<Stream>> {
 }

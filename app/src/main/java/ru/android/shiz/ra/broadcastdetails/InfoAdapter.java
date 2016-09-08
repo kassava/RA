@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streamdetails;
+package ru.android.shiz.ra.broadcastdetails;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

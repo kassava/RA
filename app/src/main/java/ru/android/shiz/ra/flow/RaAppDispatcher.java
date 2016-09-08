@@ -12,8 +12,8 @@ import flow.Dispatcher;
 import flow.Traversal;
 import flow.TraversalCallback;
 import ru.android.shiz.ra.R;
-import ru.android.shiz.ra.streamdetails.StreamDetailsScreen;
-import ru.android.shiz.ra.streams.StreamsScreen;
+import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsScreen;
+import ru.android.shiz.ra.broadcasts.BroadcastsScreen;
 
 /**
  * To tell Flow how to navigate in our app we have to define a Dispatcher.
@@ -57,10 +57,10 @@ final public class RaAppDispatcher implements Dispatcher {
         }
 
         @LayoutRes final int layout;
-        if (destination instanceof StreamsScreen) {
+        if (destination instanceof BroadcastsScreen) {
             layout = R.layout.screen_streams;
         } else {
-            if (destination instanceof StreamDetailsScreen) {
+            if (destination instanceof BroadcastDetailsScreen) {
                 layout = R.layout.screen_stream_details;
             } else {
                 throw new AssertionError("Unrecognized screen " + destination);

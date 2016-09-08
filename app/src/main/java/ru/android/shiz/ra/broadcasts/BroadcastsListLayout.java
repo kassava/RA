@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streams;
+package ru.android.shiz.ra.broadcasts;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -23,14 +23,15 @@ import butterknife.ButterKnife;
 import flow.Flow;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RaApp;
+import ru.android.shiz.ra.base.viewstate.CustomRestorableParcelableViewState;
+import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsScreen;
 import ru.android.shiz.ra.model.Stream;
 import ru.android.shiz.ra.mortar.MortarPresenter;
-import ru.android.shiz.ra.streamdetails.StreamDetailsScreen;
 
 /**
  * Created by kassava on 28.04.2016.
  */
-public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, StreamsPresenter> implements StreamsView,
+public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView, BroadcastsPresenter> implements BroadcastsView,
         SwipeRefreshLayout.OnRefreshListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
@@ -43,11 +44,11 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
     private Context context;
     private boolean isRetainInstance = false;
 
-    private StreamsAdapter adapter;
+    private BroadcastsAdapter adapter;
 
     private final MortarPresenter mortarPresenter;
 
-    public StreamsListLayout(Context ctx, AttributeSet attributeSet)  {
+    public BroadcastsListLayout(Context ctx, AttributeSet attributeSet)  {
         super(ctx, attributeSet);
 
         // presenter for mortar
@@ -65,14 +66,14 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         loadingView = findViewById(R.id.loadingView);
 
-        adapter = new StreamsAdapter(LayoutInflater.from(context),
+        adapter = new BroadcastsAdapter(LayoutInflater.from(context),
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Log.d(LOG_TAG, "onClick: " + recyclerView.getChildLayoutPosition(v));
 
-//                        Flow.get(getContext()).set(new StreamDetailsScreen(v.getId()));
-                        Flow.get(getContext()).set(new StreamDetailsScreen(recyclerView.getChildLayoutPosition(v)));
+//                        Flow.get(getContext()).set(new BroadcastDetailsScreen(v.getId()));
+                        Flow.get(getContext()).set(new BroadcastDetailsScreen(recyclerView.getChildLayoutPosition(v)));
                     }
                 }
         );
@@ -98,7 +99,7 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @NonNull
     @Override
-    public StreamsPresenter createPresenter() {
+    public BroadcastsPresenter createPresenter() {
         Log.d(LOG_TAG, "createPresenter: " + RaApp.getComponent().streamsPresenter());
 
         return RaApp.getComponent().streamsPresenter();
@@ -106,13 +107,13 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
 
     @NonNull
     @Override
-    public ViewState<StreamsView> createViewState() {
+    public ViewState<BroadcastsView> createViewState() {
         Log.d(LOG_TAG, "createViewState: " + getViewState());
 
         if (isRestoringViewState()) {
             Log.d(LOG_TAG, "isRestoringViewState");
         }
-        return new CustomRestorableParcelableViewState<List<Stream>, StreamsView>();
+        return new CustomRestorableParcelableViewState<List<Stream>, BroadcastsView>();
     }
 
     @Override
@@ -229,8 +230,8 @@ public class StreamsListLayout extends MvpViewStateFrameLayout<StreamsView, Stre
         loadData(true);
     }
 
-    private CustomRestorableParcelableViewState<List<Stream>, StreamsView> castedViewState() {
-        return (CustomRestorableParcelableViewState<List<Stream>, StreamsView>)viewState;
+    private CustomRestorableParcelableViewState<List<Stream>, BroadcastsView> castedViewState() {
+        return (CustomRestorableParcelableViewState<List<Stream>, BroadcastsView>)viewState;
     }
 
     @Override

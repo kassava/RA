@@ -1,4 +1,4 @@
-package ru.android.shiz.ra.streams;
+package ru.android.shiz.ra.broadcasts;
 
 import android.util.Log;
 
@@ -18,16 +18,16 @@ import rx.schedulers.Schedulers;
 /**
  * Created by kassava on 28.04.2016.
  */
-public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
+public class BroadcastsPresenter extends MvpBasePresenter<BroadcastsView> {
 
-    private final String LOG_TAG = StreamsPresenter.class.getSimpleName();
+    private final String LOG_TAG = BroadcastsPresenter.class.getSimpleName();
 
     Subscription subscription = null;
 
     private RaApi raApp;
 
     @Inject
-    public StreamsPresenter(RaApi raApp) {
+    public BroadcastsPresenter(RaApi raApp) {
         this.raApp = raApp;
     }
 
@@ -69,7 +69,7 @@ public class StreamsPresenter extends MvpBasePresenter<StreamsView> {
     }
 
     @Override
-    public void attachView(StreamsView view) {
+    public void attachView(BroadcastsView view) {
         super.attachView(view);
         Log.d(LOG_TAG, "attaching View to " + this);
     }

@@ -3,8 +3,8 @@ package ru.android.shiz.ra.dagger;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import ru.android.shiz.ra.streamdetails.StreamDetailsPresenter;
-import ru.android.shiz.ra.streams.StreamsPresenter;
+import ru.android.shiz.ra.broadcasts.BroadcastsPresenter;
+import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsPresenter;
 
 /**
  * Created by kassava on 09.05.2016.
@@ -13,7 +13,7 @@ import ru.android.shiz.ra.streams.StreamsPresenter;
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
 
-    public StreamsPresenter streamsPresenter();
+    public BroadcastsPresenter streamsPresenter();
 
-    public StreamDetailsPresenter streamDetailsPresenter();
+    public BroadcastDetailsPresenter streamDetailsPresenter();
 }
