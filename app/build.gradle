@@ -5,6 +5,7 @@ apply plugin: 'android-apt'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "ru.android.shiz.ra"
@@ -31,6 +32,8 @@ dependencies {
 
     compile 'com.hannesdorfmann.mosby:mvp:2.0.1'
     compile 'com.hannesdorfmann.mosby:viewstate:2.0.1'
+    compile 'com.hannesdorfmann.parcelableplease:annotation:1.0.1'
+    apt 'com.hannesdorfmann.parcelableplease:processor:1.0.1'
 
     compile 'com.squareup.flow:flow:1.0.0-alpha'
 
@@ -47,4 +50,9 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.1'
 
     compile 'com.squareup.mortar:mortar:0.20'
+
+    compile 'com.google.http-client:google-http-client-android:+'
+    compile 'com.google.api-client:google-api-client-android:+'
+    compile 'com.google.api-client:google-api-client-gson:+'
+    compile 'com.google.code.gson:gson:2.2.4'
 }

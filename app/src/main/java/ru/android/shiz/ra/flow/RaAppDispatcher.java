@@ -13,6 +13,7 @@ import flow.Traversal;
 import flow.TraversalCallback;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsScreen;
+import ru.android.shiz.ra.broadcastpreview.BroadcastPreviewScreen;
 import ru.android.shiz.ra.broadcasts.BroadcastsScreen;
 
 /**
@@ -58,12 +59,16 @@ final public class RaAppDispatcher implements Dispatcher {
 
         @LayoutRes final int layout;
         if (destination instanceof BroadcastsScreen) {
-            layout = R.layout.screen_streams;
+            layout = R.layout.screen_broadcasts;
         } else {
             if (destination instanceof BroadcastDetailsScreen) {
-                layout = R.layout.screen_stream_details;
+                layout = R.layout.screen_broadcast_details;
             } else {
-                throw new AssertionError("Unrecognized screen " + destination);
+                if (destination instanceof BroadcastPreviewScreen) {
+                    layout = R.layout.screen_broadcast_preview;
+                } else {
+                    throw new AssertionError("Unrecognized screen " + destination);
+                }
             }
         }
 

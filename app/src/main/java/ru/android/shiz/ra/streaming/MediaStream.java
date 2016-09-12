@@ -199,8 +199,8 @@ public abstract class MediaStream implements Stream {
 
     /**
      * Configures the stream with the settings supplied with
-     * {@link VideoStream#setVideoQuality(net.majorkernelpanic.streaming.video.VideoQuality)}
-     * for a {@link VideoStream} and {@link AudioStream#setAudioQuality(net.majorkernelpanic.streaming.audio.AudioQuality)}
+     * {@link VideoStream#setVideoQuality(ru.android.shiz.ra.streaming.video.VideoQuality)}
+     * for a {@link VideoStream} and {@link AudioStream#setAudioQuality(ru.android.shiz.ra.streaming.audio.AudioQuality)}
      * for a {@link AudioStream}.
      */
     public synchronized void configure() throws IllegalStateException, IOException {
@@ -264,7 +264,7 @@ public abstract class MediaStream implements Stream {
     public abstract String getSessionDescription();
 
     /**
-     * Returns the SSRC of the underlying {@link net.majorkernelpanic.streaming.rtp.RtpSocket}.
+     * Returns the SSRC of the underlying {@link ru.android.shiz.ra.streaming.rtp.RtpSocket}.
      * @return the SSRC of the stream
      */
     public int getSSRC() {

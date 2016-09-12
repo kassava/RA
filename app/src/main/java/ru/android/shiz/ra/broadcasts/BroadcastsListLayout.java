@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
@@ -20,11 +23,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Optional;
 import flow.Flow;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RaApp;
 import ru.android.shiz.ra.base.viewstate.CustomRestorableParcelableViewState;
 import ru.android.shiz.ra.broadcastdetails.BroadcastDetailsScreen;
+import ru.android.shiz.ra.broadcastpreview.BroadcastPreviewScreen;
 import ru.android.shiz.ra.model.Stream;
 import ru.android.shiz.ra.mortar.MortarPresenter;
 
@@ -40,6 +45,7 @@ public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.errorView) View errorView;
     @BindView(R.id.loadingView) View loadingView;
+    @BindView(R.id.showfab) FloatingActionButton showFab;
 
     private Context context;
     private boolean isRetainInstance = false;
@@ -61,10 +67,20 @@ public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView
 
         LayoutInflater.from(context).inflate(R.layout.recycler_swiperefresh_view, this, true);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        errorView = findViewById(R.id.errorView);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        loadingView = findViewById(R.id.loadingView);
+//        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+//        errorView = findViewById(R.id.errorView);
+//        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+//        loadingView = findViewById(R.id.loadingView);
+
+
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        ButterKnife.bind(this);
+
+        Log.d(LOG_TAG, "onFinishInflate");
 
         adapter = new BroadcastsAdapter(LayoutInflater.from(context),
                 new View.OnClickListener() {
@@ -89,20 +105,21 @@ public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView
         });
 
         swipeRefreshLayout.setOnRefreshListener(this);
-    }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        ButterKnife.bind(this);
+        showFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Flow.get(getContext()).set(new BroadcastPreviewScreen());
+            }
+        });
     }
 
     @NonNull
     @Override
     public BroadcastsPresenter createPresenter() {
-        Log.d(LOG_TAG, "createPresenter: " + RaApp.getComponent().streamsPresenter());
+        Log.d(LOG_TAG, "createPresenter: " + RaApp.getComponent().broadcastsPresenter());
 
-        return RaApp.getComponent().streamsPresenter();
+        return RaApp.getComponent().broadcastsPresenter();
     }
 
     @NonNull
@@ -245,11 +262,7 @@ public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView
     @Override
     protected void onAttachedToWindow() {
         Log.d(LOG_TAG, "onAttachedFromWindow: " + viewState);
-        if (mortarPresenter.getViewState() != null) {
-            isRetainInstance = true;
-        } else {
-            isRetainInstance = false;
-        }
+        isRetainInstance = mortarPresenter.getViewState() != null;
         if (isRetainInstance) {
             viewState = mortarPresenter.getViewState();
         }

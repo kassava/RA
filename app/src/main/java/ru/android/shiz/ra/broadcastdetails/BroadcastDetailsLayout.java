@@ -123,7 +123,7 @@ public class BroadcastDetailsLayout extends MvpViewStateFrameLayout<BroadcastDet
     @NonNull
     @Override
     public BroadcastDetailsPresenter createPresenter() {
-        return RaApp.getComponent().streamDetailsPresenter();
+        return RaApp.getComponent().broadcastDetailsPresenter();
     }
 
 

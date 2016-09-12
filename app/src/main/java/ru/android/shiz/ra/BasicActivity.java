@@ -44,19 +44,6 @@ public class BasicActivity extends AppCompatActivity {
 
         BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState);
 
-        // from Mortar git sample.
-//        MortarScope parentScope = MortarScope.getScope(getApplication());
-//        String scopeName = getLocalClassName() + "-task-" + getTaskId();
-//
-//        activityScope = parentScope.findChild(scopeName);
-//        if (activityScope == null) {
-//            activityScope = parentScope.buildChild()
-//                    .withService(BundleServiceRunner.SERVICE_NAME, new BundleServiceRunner())
-//                    .build(scopeName);
-//        }
-//
-//        BundleServiceRunner.getBundleServiceRunner(activityScope).onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_basic);
     }
 
