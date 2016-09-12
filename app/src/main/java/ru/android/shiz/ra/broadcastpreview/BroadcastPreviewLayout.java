@@ -27,8 +27,6 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
         super(ctx, attributeSet);
 
         this.context = ctx;
-        LayoutInflater.from(context).inflate(R.layout.recycler_swiperefresh_view, this, true);
-
 
     }
 
