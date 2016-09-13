@@ -65,14 +65,12 @@ public class BroadcastsListLayout extends MvpViewStateFrameLayout<BroadcastsView
         this.context = ctx;
         this.isRetainInstance = true;
 
-        LayoutInflater.from(context).inflate(R.layout.recycler_swiperefresh_view, this, true);
+//        LayoutInflater.from(context).inflate(R.layout.recycler_swiperefresh_view, this, true);
 
 //        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 //        errorView = findViewById(R.id.errorView);
 //        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 //        loadingView = findViewById(R.id.loadingView);
-
-
     }
 
     @Override

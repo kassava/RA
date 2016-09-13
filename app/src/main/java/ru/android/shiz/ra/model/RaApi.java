@@ -50,7 +50,7 @@ public class RaApi {
             streams = new ArrayList(streamsMap2.values());
         }
 
-        return Observable.just(streams).delay(3, TimeUnit.SECONDS);
+        return Observable.just(streams).delay(3, TimeUnit.MILLISECONDS);
     }
 
     public Observable<StreamDetail> getDetails(int id) {
@@ -76,6 +76,6 @@ public class RaApi {
 
         StreamDetail streamDetail = new StreamDetail(id, "url", infoList);
         details.add(streamDetail);
-        return Observable.just(streamDetail).delay(2, TimeUnit.SECONDS);
+        return Observable.just(streamDetail).delay(2, TimeUnit.MILLISECONDS);
     }
 }

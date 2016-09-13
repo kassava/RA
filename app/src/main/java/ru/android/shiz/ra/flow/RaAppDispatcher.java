@@ -59,7 +59,7 @@ final public class RaAppDispatcher implements Dispatcher {
 
         @LayoutRes final int layout;
         if (destination instanceof BroadcastsScreen) {
-            layout = R.layout.screen_broadcasts;
+            layout = R.layout.screen_broadcasts2;
         } else {
             if (destination instanceof BroadcastDetailsScreen) {
                 layout = R.layout.screen_broadcast_details;
