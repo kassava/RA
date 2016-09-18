@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RA</string>
+    <string name="record">Запись</string>
+    <string name="stop">Stop</string>
 </resources>

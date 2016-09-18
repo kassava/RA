@@ -2,13 +2,7 @@ package ru.android.shiz.ra.broadcastpreview;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -23,20 +17,19 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.v13.app.FragmentCompat;
-import android.support.v4.app.ActivityCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.Display;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Toast;
+import android.view.WindowManager;
+import android.widget.Button;
 
 import com.hannesdorfmann.mosby.mvp.layout.MvpFrameLayout;
 
@@ -51,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import flow.Flow;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RaApp;
 
@@ -59,7 +53,7 @@ import ru.android.shiz.ra.RaApp;
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView, BroadcastPreviewPresenter>
-        implements BroadcastPreviewView {
+        implements BroadcastPreviewView, View.OnClickListener {
 
     private static final String LOG_TAG = BroadcastPreviewLayout.class.getSimpleName();
 
@@ -96,13 +90,12 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     /**
      * An {@link AutoFitTextureView} for camera preview.
      */
-    @BindView(R.id.texture)
-    private AutoFitTextureView mTextureView;
+    @BindView(R.id.texture) AutoFitTextureView textureView;
 
-//    /**
-//     * Button to record video
-//     */
-//    private Button mButtonVideo;
+    /**
+     * Button to record video
+     */
+    @BindView(R.id.record_button) Button videoButton;
 
     /**
      * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
@@ -113,13 +106,13 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
      * A reference to the current {@link android.hardware.camera2.CameraCaptureSession} for
      * preview.
      */
-    private CameraCaptureSession mPreviewSession;
+    private CameraCaptureSession previewSession;
 
     /**
      * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
      * {@link TextureView}.
      */
-    private TextureView.SurfaceTextureListener mSurfaceTextureListener
+    private TextureView.SurfaceTextureListener surfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
 
         @Override
@@ -148,68 +141,72 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     /**
      * The {@link android.util.Size} of camera preview.
      */
-    private Size mPreviewSize;
+    private Size previewSize;
 
     /**
      * The {@link android.util.Size} of video recording.
      */
-    private Size mVideoSize;
+    private Size videoSize;
 
     /**
      * MediaRecorder
      */
-    private MediaRecorder mMediaRecorder;
+    private MediaRecorder mediaRecorder;
 
     /**
      * Whether the app is recording video now
      */
-    private boolean mIsRecordingVideo;
+    private boolean isRecordingVideo;
 
     /**
      * An additional thread for running tasks that shouldn't block the UI.
      */
-    private HandlerThread mBackgroundThread;
+    private HandlerThread backgroundThread;
 
     /**
      * A {@link Handler} for running tasks in the background.
      */
-    private Handler mBackgroundHandler;
+    private Handler backgroundHandler;
 
     /**
      * A {@link Semaphore} to prevent the app from exiting before closing the camera.
      */
-    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
+    private Semaphore cameraOpenCloseLock = new Semaphore(1);
 
     /**
      * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its status.
      */
-    private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+    private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
 
         @Override
-        public void onOpened(CameraDevice cameraDevice) {
+        public void onOpened(@NonNull CameraDevice cameraDevice) {
             BroadcastPreviewLayout.this.cameraDevice = cameraDevice;
             startPreview();
-            mCameraOpenCloseLock.release();
-            if (null != mTextureView) {
-                configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+            cameraOpenCloseLock.release();
+            if (null != textureView) {
+                configureTransform(textureView.getWidth(), textureView.getHeight());
             }
         }
 
         @Override
-        public void onDisconnected(CameraDevice cameraDevice) {
-            mCameraOpenCloseLock.release();
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+            cameraOpenCloseLock.release();
             cameraDevice.close();
             BroadcastPreviewLayout.this.cameraDevice = null;
         }
 
         @Override
-        public void onError(CameraDevice cameraDevice, int error) {
-            mCameraOpenCloseLock.release();
+        public void onError(@NonNull CameraDevice cameraDevice, int error) {
+            cameraOpenCloseLock.release();
             cameraDevice.close();
             BroadcastPreviewLayout.this.cameraDevice = null;
-            Activity activity = getActivity();
-            if (null != activity) {
-                activity.finish();
+
+//            Activity activity = getActivity();
+//            if (null != activity) {
+//                activity.finish();
+//            }
+            if(context != null) {
+                Flow.get(context).goBack();
             }
         }
 
@@ -233,6 +230,7 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     private static Size chooseVideoSize(Size[] choices) {
         for (Size size : choices) {
             if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080) {
+                Log.d(LOG_TAG, "Size.width: " + size.getWidth() + ", Size.height: " + size.getHeight());
                 return size;
             }
         }
@@ -253,7 +251,7 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
      */
     private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
         // Collect the supported resolutions that are at least as big as the preview Surface
-        List<Size> bigEnough = new ArrayList<Size>();
+        List<Size> bigEnough = new ArrayList<>();
         int w = aspectRatio.getWidth();
         int h = aspectRatio.getHeight();
         for (Size option : choices) {
@@ -280,48 +278,38 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 //
 //    @Override
 //    public void onViewCreated(final View view, Bundle savedInstanceState) {
-//        mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-//        mButtonVideo = (Button) view.findViewById(R.id.video);
-//        mButtonVideo.setOnClickListener(this);
+//        textureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+//        videoButton = (Button) view.findViewById(R.id.video);
+//        videoButton.setOnClickListener(this);
 //        view.findViewById(R.id.info).setOnClickListener(this);
 //    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        startBackgroundThread();
-        if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());
-        } else {
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-        }
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        startBackgroundThread();
+//        if (textureView.isAvailable()) {
+//            openCamera(textureView.getWidth(), textureView.getHeight());
+//        } else {
+//            textureView.setSurfaceTextureListener(surfaceTextureListener);
+//        }
+//    }
 
-    @Override
-    public void onPause() {
-        closeCamera();
-        stopBackgroundThread();
-        super.onPause();
-    }
+//    @Override
+//    public void onPause() {
+//        closeCamera();
+//        stopBackgroundThread();
+//        super.onPause();
+//    }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.video: {
-                if (mIsRecordingVideo) {
+            case R.id.record_button: {
+                if (isRecordingVideo) {
                     stopRecordingVideo();
                 } else {
                     startRecordingVideo();
-                }
-                break;
-            }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-                    new AlertDialog.Builder(activity)
-                            .setMessage(R.string.intro_message)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
                 }
                 break;
             }
@@ -332,20 +320,20 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
      * Starts a background thread and its {@link Handler}.
      */
     private void startBackgroundThread() {
-        mBackgroundThread = new HandlerThread("CameraBackground");
-        mBackgroundThread.start();
-        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+        backgroundThread = new HandlerThread("CameraBackground");
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
     }
 
     /**
      * Stops the background thread and its {@link Handler}.
      */
     private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
+        backgroundThread.quitSafely();
         try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
+            backgroundThread.join();
+            backgroundThread = null;
+            backgroundHandler = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -357,74 +345,77 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
      * @param permissions The permissions your app wants to request.
      * @return Whether you can show permission rationale UI.
      */
-    private boolean shouldShowRequestPermissionRationale(String[] permissions) {
-        for (String permission : permissions) {
-            if (FragmentCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean shouldShowRequestPermissionRationale(String[] permissions) {
+//        for (String permission : permissions) {
+//            if (FragmentCompat.shouldShowRequestPermissionRationale(this, permission)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Requests permissions needed for recording video.
      */
-    private void requestVideoPermissions() {
-        if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS)) {
-            new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
-        } else {
-            FragmentCompat.requestPermissions(this, VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult");
-        if (requestCode == REQUEST_VIDEO_PERMISSIONS) {
-            if (grantResults.length == VIDEO_PERMISSIONS.length) {
-                for (int result : grantResults) {
-                    if (result != PackageManager.PERMISSION_GRANTED) {
-                        ErrorDialog.newInstance(getString(R.string.permission_request))
-                                .show(getChildFragmentManager(), FRAGMENT_DIALOG);
-                        break;
-                    }
-                }
-            } else {
-                ErrorDialog.newInstance(getString(R.string.permission_request))
-                        .show(getChildFragmentManager(), FRAGMENT_DIALOG);
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private boolean hasPermissionsGranted(String[] permissions) {
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    private void requestVideoPermissions() {
+//        if (shouldShowRequestPermissionRationale(VIDEO_PERMISSIONS)) {
+//            new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
+//        } else {
+//            FragmentCompat.requestPermissions(this, VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
+//        }
+//    }
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        Log.d(TAG, "onRequestPermissionsResult");
+//        if (requestCode == REQUEST_VIDEO_PERMISSIONS) {
+//            if (grantResults.length == VIDEO_PERMISSIONS.length) {
+//                for (int result : grantResults) {
+//                    if (result != PackageManager.PERMISSION_GRANTED) {
+//                        ErrorDialog.newInstance(getString(R.string.permission_request))
+//                                .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+//                        break;
+//                    }
+//                }
+//            } else {
+//                ErrorDialog.newInstance(getString(R.string.permission_request))
+//                        .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+//            }
+//        } else {
+//            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+//    }
+//
+//    private boolean hasPermissionsGranted(String[] permissions) {
+//        for (String permission : permissions) {
+//            if (ActivityCompat.checkSelfPermission(getActivity(), permission)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     /**
-     * Tries to open a {@link CameraDevice}. The result is listened by `mStateCallback`.
+     * Tries to open a {@link CameraDevice}. The result is listened by `stateCallback`.
      */
     private void openCamera(int width, int height) {
-        if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
-            requestVideoPermissions();
+//        if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
+//            requestVideoPermissions();
+//            return;
+//        }
+//        final Activity activity = getActivity();
+//        if (null == activity || activity.isFinishing()) {
+//            return;
+//        }
+        if (context == null) {
             return;
         }
-        final Activity activity = getActivity();
-        if (null == activity || activity.isFinishing()) {
-            return;
-        }
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         try {
             Log.d(TAG, "tryAcquire");
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+            if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             String cameraId = manager.getCameraIdList()[0];
@@ -434,27 +425,29 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             StreamConfigurationMap map = characteristics
                     .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-            mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
-            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                    width, height, mVideoSize);
+            videoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+            previewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                    width, height, videoSize);
 
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                textureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
             } else {
-                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+                textureView.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
             }
             configureTransform(width, height);
-            mMediaRecorder = new MediaRecorder();
-            manager.openCamera(cameraId, mStateCallback, null);
+            mediaRecorder = new MediaRecorder();
+            manager.openCamera(cameraId, stateCallback, null);
         } catch (CameraAccessException e) {
-            Toast.makeText(activity, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
-            activity.finish();
+//            Toast.makeText(activity, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
+//            activity.finish();
+            Log.d(LOG_TAG, "Не достпуа к камере.");
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            ErrorDialog.newInstance(getString(R.string.camera_error))
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+//            ErrorDialog.newInstance(getString(R.string.camera_error))
+//                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            Log.d(LOG_TAG, "Это устройство не поддерживает Camera2 API");
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
@@ -462,20 +455,20 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 
     private void closeCamera() {
         try {
-            mCameraOpenCloseLock.acquire();
+            cameraOpenCloseLock.acquire();
             closePreviewSession();
             if (null != cameraDevice) {
                 cameraDevice.close();
                 cameraDevice = null;
             }
-            if (null != mMediaRecorder) {
-                mMediaRecorder.release();
-                mMediaRecorder = null;
+            if (null != mediaRecorder) {
+                mediaRecorder.release();
+                mediaRecorder = null;
             }
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera closing.");
         } finally {
-            mCameraOpenCloseLock.release();
+            cameraOpenCloseLock.release();
         }
     }
 
@@ -483,14 +476,14 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
      * Start the camera preview.
      */
     private void startPreview() {
-        if (null == cameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
+        if (null == cameraDevice || !textureView.isAvailable() || null == previewSize) {
             return;
         }
         try {
             closePreviewSession();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
+            SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
             previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
             Surface previewSurface = new Surface(texture);
@@ -499,19 +492,20 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             cameraDevice.createCaptureSession(Arrays.asList(previewSurface), new CameraCaptureSession.StateCallback() {
 
                 @Override
-                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
-                    mPreviewSession = cameraCaptureSession;
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                    previewSession = cameraCaptureSession;
                     updatePreview();
                 }
 
                 @Override
                 public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
-                    Activity activity = getActivity();
-                    if (null != activity) {
-                        Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
-                    }
+//                    Activity activity = getActivity();
+//                    if (null != activity) {
+//                        Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
+//                    }
+                    Log.d(LOG_TAG, "Failed");
                 }
-            }, mBackgroundHandler);
+            }, backgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -528,7 +522,7 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             setUpCaptureRequestBuilder(previewBuilder);
             HandlerThread thread = new HandlerThread("CameraPreview");
             thread.start();
-            mPreviewSession.setRepeatingRequest(previewBuilder.build(), null, mBackgroundHandler);
+            previewSession.setRepeatingRequest(previewBuilder.build(), null, backgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -539,63 +533,73 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     }
 
     /**
-     * Configures the necessary {@link android.graphics.Matrix} transformation to `mTextureView`.
+     * Configures the necessary {@link android.graphics.Matrix} transformation to `textureView`.
      * This method should not to be called until the camera preview size is determined in
-     * openCamera, or until the size of `mTextureView` is fixed.
+     * openCamera, or until the size of `textureView` is fixed.
      *
-     * @param viewWidth  The width of `mTextureView`
-     * @param viewHeight The height of `mTextureView`
+     * @param viewWidth  The width of `textureView`
+     * @param viewHeight The height of `textureView`
      */
     private void configureTransform(int viewWidth, int viewHeight) {
-        Activity activity = getActivity();
-        if (null == mTextureView || null == mPreviewSize || null == activity) {
+//        Activity activity = getActivity();
+        if (null == textureView || null == previewSize || null == context) {
             return;
         }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+//        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        RectF bufferRect = new RectF(0, 0, previewSize.getHeight(), previewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
+                    (float) viewHeight / previewSize.getHeight(),
+                    (float) viewWidth / previewSize.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
-        mTextureView.setTransform(matrix);
+        textureView.setTransform(matrix);
     }
 
     private void setUpMediaRecorder() throws IOException {
-        final Activity activity = getActivity();
-        if (null == activity) {
+//        final Activity activity = getActivity();
+//        if (null == activity) {
+//            return;
+//        }
+        if(context == null) {
             return;
         }
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         if (nextVideoAbsolutePath == null || nextVideoAbsolutePath.isEmpty()) {
-            nextVideoAbsolutePath = getVideoFilePath(getActivity());
+//            nextVideoAbsolutePath = getVideoFilePath(getActivity());
+            nextVideoAbsolutePath = getVideoFilePath(context);
         }
-        mMediaRecorder.setOutputFile(nextVideoAbsolutePath);
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        mediaRecorder.setOutputFile(nextVideoAbsolutePath);
+        mediaRecorder.setVideoEncodingBitRate(10000000);
+        mediaRecorder.setVideoFrameRate(30);
+        mediaRecorder.setVideoSize(videoSize.getWidth(), videoSize.getHeight());
+        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+//        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+
         switch (sensorOrientation) {
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
-                mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));
+                mediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));
                 break;
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
-                mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
+                mediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
                 break;
         }
-        mMediaRecorder.prepare();
+        mediaRecorder.prepare();
     }
 
     private String getVideoFilePath(Context context) {
@@ -604,15 +608,15 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     }
 
     private void startRecordingVideo() {
-        if (null == cameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
+        if (null == cameraDevice || !textureView.isAvailable() || null == previewSize) {
             return;
         }
         try {
             closePreviewSession();
             setUpMediaRecorder();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
+            SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
             previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
             List<Surface> surfaces = new ArrayList<>();
 
@@ -622,7 +626,7 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             previewBuilder.addTarget(previewSurface);
 
             // Set up Surface for the MediaRecorder
-            recorderSurface = mMediaRecorder.getSurface();
+            recorderSurface = mediaRecorder.getSurface();
             surfaces.add(recorderSurface);
             previewBuilder.addTarget(recorderSurface);
 
@@ -632,56 +636,59 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    mPreviewSession = cameraCaptureSession;
+                    previewSession = cameraCaptureSession;
                     updatePreview();
-                    getActivity().runOnUiThread(new Runnable() {
+                    // Something strange...
+                    videoButton.post(new Runnable() {
                         @Override
                         public void run() {
                             // UI
-                            mButtonVideo.setText(R.string.stop);
-                            mIsRecordingVideo = true;
+                            videoButton.setText(R.string.stop);
+                            isRecordingVideo = true;
 
                             // Start recording
-                            mMediaRecorder.start();
+                            mediaRecorder.start();
                         }
                     });
                 }
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Activity activity = getActivity();
-                    if (null != activity) {
-                        Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
-                    }
+//                    Activity activity = getActivity();
+//                    if (null != activity) {
+//                        Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
+//                    }
+                    Log.d(LOG_TAG, "Failed");
                 }
-            }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            }, backgroundHandler);
+        } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
     private void closePreviewSession() {
-        if (mPreviewSession != null) {
-            mPreviewSession.close();
-            mPreviewSession = null;
+        if (previewSession != null) {
+            previewSession.close();
+            previewSession = null;
         }
     }
 
     private void stopRecordingVideo() {
         // UI
-        mIsRecordingVideo = false;
-        mButtonVideo.setText(R.string.record);
+        isRecordingVideo = false;
+        videoButton.setText(R.string.record);
         // Stop recording
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
+        mediaRecorder.stop();
+        mediaRecorder.reset();
 
-        Activity activity = getActivity();
-        if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + nextVideoAbsolutePath,
-                    Toast.LENGTH_SHORT).show();
+//        Activity activity = getActivity();
+//        if (null != activity) {
+//            Toast.makeText(activity, "Video saved: " + nextVideoAbsolutePath,
+//                    Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, "Video saved: " + nextVideoAbsolutePath);
+//        }
+        if (context != null) {
             Log.d(TAG, "Video saved: " + nextVideoAbsolutePath);
         }
         nextVideoAbsolutePath = null;
@@ -702,59 +709,59 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 
     }
 
-    public static class ErrorDialog extends DialogFragment {
+//    public static class ErrorDialog extends DialogFragment {
+//
+//        private static final String ARG_MESSAGE = "message";
+//
+//        public static ErrorDialog newInstance(String message) {
+//            ErrorDialog dialog = new ErrorDialog();
+//            Bundle args = new Bundle();
+//            args.putString(ARG_MESSAGE, message);
+//            dialog.setArguments(args);
+//            return dialog;
+//        }
+//
+//        @Override
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//            final Activity activity = getActivity();
+//            return new AlertDialog.Builder(activity)
+//                    .setMessage(getArguments().getString(ARG_MESSAGE))
+//                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            activity.finish();
+//                        }
+//                    })
+//                    .create();
+//        }
+//
+//    }
 
-        private static final String ARG_MESSAGE = "message";
-
-        public static ErrorDialog newInstance(String message) {
-            ErrorDialog dialog = new ErrorDialog();
-            Bundle args = new Bundle();
-            args.putString(ARG_MESSAGE, message);
-            dialog.setArguments(args);
-            return dialog;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Activity activity = getActivity();
-            return new AlertDialog.Builder(activity)
-                    .setMessage(getArguments().getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
-                        }
-                    })
-                    .create();
-        }
-
-    }
-
-    public static class ConfirmationDialog extends DialogFragment {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Fragment parent = getParentFragment();
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(R.string.permission_request)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            FragmentCompat.requestPermissions(parent, VIDEO_PERMISSIONS,
-                                    REQUEST_VIDEO_PERMISSIONS);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    parent.getActivity().finish();
-                                }
-                            })
-                    .create();
-        }
-
-    }
+//    public static class ConfirmationDialog extends DialogFragment {
+//
+//        @Override
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//            final Fragment parent = getParentFragment();
+//            return new AlertDialog.Builder(getActivity())
+//                    .setMessage(R.string.permission_request)
+//                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            FragmentCompat.requestPermissions(parent, VIDEO_PERMISSIONS,
+//                                    REQUEST_VIDEO_PERMISSIONS);
+//                        }
+//                    })
+//                    .setNegativeButton(android.R.string.cancel,
+//                            new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    parent.getActivity().finish();
+//                                }
+//                            })
+//                    .create();
+//        }
+//
+//    }
 
     public BroadcastPreviewLayout(Context ctx, AttributeSet attributeSet) {
         super(ctx, attributeSet);
@@ -773,5 +780,25 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
         ButterKnife.bind(this);
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        Log.d(LOG_TAG, "onDetachedFromWindow");
+        super.onDetachedFromWindow();
 
+        closeCamera();
+        stopBackgroundThread();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        Log.d(LOG_TAG, "onAttachedFromWindow");
+        super.onAttachedToWindow();
+
+        startBackgroundThread();
+        if (textureView.isAvailable()) {
+            openCamera(textureView.getWidth(), textureView.getHeight());
+        } else {
+            textureView.setSurfaceTextureListener(surfaceTextureListener);
+        }
+    }
 }

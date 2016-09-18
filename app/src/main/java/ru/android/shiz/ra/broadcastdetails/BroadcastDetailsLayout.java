@@ -89,7 +89,7 @@ public class BroadcastDetailsLayout extends MvpViewStateFrameLayout<BroadcastDet
         super.onFinishInflate();
         ButterKnife.bind(this);
 
-        toolbar.setNavigationIcon(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
