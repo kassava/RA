@@ -159,8 +159,6 @@ public class CamBaseV2 {
         mPreviewSurfaceView.setLayoutParams(layoutParams);
         mPreviewSurfaceView.setSurfaceTextureListener(mSurfaceextureListener);
 
-        configureTransform(layoutParams.width, layoutParams.height);
-
         rootLayout.addView(mPreviewSurfaceView);
     }
 
@@ -216,33 +214,6 @@ public class CamBaseV2 {
 //        layoutParams.leftMargin = -widthMargin;
 //        layoutParams.topMargin = -heightMargin;
         return layoutParams;
-    }
-
-    private void configureTransform(int viewWidth, int viewHeight) {
-        if (null == mPreviewSurfaceView || null == mPreviewSize || null == context) {
-            return;
-        }
-        int rotation = getDisplayRotation(context) / 90;
-        Log.d(LOG_TAG, "configureTransform. rotation: " + rotation);
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
-        float centerX = viewRect.centerX();
-        float centerY = viewRect.centerY();
-        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
-
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-        }
-
-        float[] mtx = new float[16];
-        matrix.getValues(mtx);
-        mPreviewSurfaceView.getSurfaceTexture().getTransformMatrix(mtx);
     }
 
     private int getDisplayRotation(Context context) {

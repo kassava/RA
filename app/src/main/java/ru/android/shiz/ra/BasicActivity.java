@@ -2,7 +2,9 @@ package ru.android.shiz.ra;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 
 import flow.Flow;
 import mortar.MortarScope;
@@ -45,6 +47,8 @@ public class BasicActivity extends AppCompatActivity {
         BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_basic);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
