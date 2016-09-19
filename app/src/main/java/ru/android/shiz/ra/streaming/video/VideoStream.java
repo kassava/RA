@@ -446,7 +446,7 @@ public abstract class VideoStream extends MediaStream {
                 now = System.nanoTime()/1000;
                 if (i++>3) {
                     i = 0;
-                    //Log.d(TAG,"Measured: "+1000000L/(now-oldnow)+" fps.");
+                    //Log.d(LOG_TAG,"Measured: "+1000000L/(now-oldnow)+" fps.");
                 }
                 try {
                     int bufferIndex = mMediaCodec.dequeueInputBuffer(500000);

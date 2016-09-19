@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.android.shiz.ra.broadcastpreview;
+package ru.android.shiz.ra.broadcastpreview.camera;
 
         import android.content.Context;
         import android.util.AttributeSet;

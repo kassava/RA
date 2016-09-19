@@ -437,7 +437,7 @@ public class EncoderDebugger {
                         d = (mInitialImage[i]&0xFF) - (mDecodedVideo[j][i]&0xFF);
                         d = d<0 ? -d : d;
                         if (d>50) {
-                            //if (VERBOSE) Log.e(TAG,"BUG "+(i-mSize)+" d "+d);
+                            //if (VERBOSE) Log.e(LOG_TAG,"BUG "+(i-mSize)+" d "+d);
                             f++;
                             break;
                         }

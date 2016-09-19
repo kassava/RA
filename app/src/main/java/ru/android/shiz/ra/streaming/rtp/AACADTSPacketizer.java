@@ -124,7 +124,7 @@ public class AACADTSPacketizer extends AbstractPacketizer implements Runnable {
                 // We update the RTP timestamp
                 ts +=  1024L*1000000000L/samplingRate; //stats.average();
 
-                //Log.d(TAG,"frameLength: "+frameLength+" protection: "+protection+" p: "+profile+" sr: "+samplingRate);
+                //Log.d(LOG_TAG,"frameLength: "+frameLength+" protection: "+protection+" p: "+profile+" sr: "+samplingRate);
 
                 sum = 0;
                 while (sum<frameLength) {

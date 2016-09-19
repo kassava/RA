@@ -553,7 +553,7 @@ public class RtspClient {
 
             // Parsing headers of the request
             while ( (line = input.readLine()) != null) {
-                //Log.e(TAG,"l: "+line.length()+"c: "+line);
+                //Log.e(LOG_TAG,"l: "+line.length()+"c: "+line);
                 if (line.length()>3) {
                     matcher = rexegHeader.matcher(line);
                     matcher.find();

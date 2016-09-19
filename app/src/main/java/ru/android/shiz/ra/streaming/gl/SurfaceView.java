@@ -109,7 +109,7 @@ public class SurfaceView extends android.view.SurfaceView implements Runnable, O
                             mTextureManager.drawFrame();
                             oldts = ts;
                             ts = mTextureManager.getSurfaceTexture().getTimestamp();
-                            //Log.d(TAG,"FPS: "+(1000000000/(ts-oldts)));
+                            //Log.d(LOG_TAG,"FPS: "+(1000000000/(ts-oldts)));
                             mCodecSurfaceManager.setPresentationTime(ts);
                             mCodecSurfaceManager.swapBuffer();
                         }

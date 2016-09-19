@@ -24,11 +24,11 @@ public class BroadcastsPresenter extends MvpBasePresenter<BroadcastsView> {
 
     Subscription subscription = null;
 
-    private RaApi raApp;
+    private RaApi raApi;
 
     @Inject
     public BroadcastsPresenter(RaApi raApp) {
-        this.raApp = raApp;
+        this.raApi = raApp;
     }
 
     public void loadStreams(final boolean pullToRefresh) {
@@ -38,7 +38,7 @@ public class BroadcastsPresenter extends MvpBasePresenter<BroadcastsView> {
             getView().showLoading(pullToRefresh);
         }
 
-        subscription = raApp.getStreams()
+        subscription = raApi.getStreams()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Stream>>() {

@@ -226,7 +226,7 @@ public class AACStream extends AudioStream {
                             if (len ==  AudioRecord.ERROR_INVALID_OPERATION || len == AudioRecord.ERROR_BAD_VALUE) {
                                 Log.e(TAG,"An error occured with the AudioRecord API !");
                             } else {
-                                //Log.v(TAG,"Pushing raw audio to the decoder: len="+len+" bs: "+inputBuffers[bufferIndex].capacity());
+                                //Log.v(LOG_TAG,"Pushing raw audio to the decoder: len="+len+" bs: "+inputBuffers[bufferIndex].capacity());
                                 mMediaCodec.queueInputBuffer(bufferIndex, 0, len, System.nanoTime()/1000, 0);
                             }
                         }

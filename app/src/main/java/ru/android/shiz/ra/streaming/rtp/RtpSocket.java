@@ -256,7 +256,7 @@ public class RtpSocket implements Runnable {
                     if ((mTimestamps[mBufferOut]-mOldTimestamp)>0) {
                         stats.push(mTimestamps[mBufferOut]-mOldTimestamp);
                         long d = stats.average()/1000000;
-                        //Log.d(TAG,"delay: "+d+" d: "+(mTimestamps[mBufferOut]-mOldTimestamp)/1000000);
+                        //Log.d(LOG_TAG,"delay: "+d+" d: "+(mTimestamps[mBufferOut]-mOldTimestamp)/1000000);
                         // We ensure that packets are sent at a constant and suitable rate no matter how the RtpSocket is used.
                         if (mCacheSize>0) Thread.sleep(d);
                     } else if ((mTimestamps[mBufferOut]-mOldTimestamp)<0) {
@@ -264,7 +264,7 @@ public class RtpSocket implements Runnable {
                     }
                     delta += mTimestamps[mBufferOut]-mOldTimestamp;
                     if (delta>500000000 || delta<0) {
-                        //Log.d(TAG,"permits: "+mBufferCommitted.availablePermits());
+                        //Log.d(LOG_TAG,"permits: "+mBufferCommitted.availablePermits());
                         delta = 0;
                     }
                 }
@@ -345,7 +345,7 @@ public class RtpSocket implements Runnable {
                 sum += mSum[i];
                 delta += mElapsed[i];
             }
-            //Log.d(TAG, "Time elapsed: "+delta);
+            //Log.d(LOG_TAG, "Time elapsed: "+delta);
             return (int) (delta>0?8000*sum/delta:0);
         }
 
@@ -381,7 +381,7 @@ public class RtpSocket implements Runnable {
                     initoffset = true;
                 }
                 value -= (now - start) - duration;
-                //Log.d(TAG, "sum1: "+duration/1000000+" sum2: "+(now-start)/1000000+" drift: "+((now-start)-duration)/1000000+" v: "+value/1000000);
+                //Log.d(LOG_TAG, "sum1: "+duration/1000000+" sum2: "+(now-start)/1000000+" drift: "+((now-start)-duration)/1000000+" v: "+value/1000000);
             }
             if (c<40) {
                 // We ignore the first 40 measured values because they may not be accurate
