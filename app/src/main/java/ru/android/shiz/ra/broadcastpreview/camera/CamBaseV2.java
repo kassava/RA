@@ -3,10 +3,8 @@ package ru.android.shiz.ra.broadcastpreview.camera;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.opengl.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -14,6 +12,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -21,9 +20,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class CamBaseV2 {
     private Handler mCameraHandler = null;
     private Surface mPreviewSurface = null;
     private boolean mIsPreviewing = false;
-    private LinearLayout mRootView = null;
+    private RelativeLayout rootView = null;
     private Size mPreviewSize = null;
     private PreviewGLSurfaceView mPreviewSurfaceView = null;
     private SurfaceTexture mPreviewSurfaceTexture = null;
@@ -56,14 +56,14 @@ public class CamBaseV2 {
 
     private Context context = null;
 
-    public CamBaseV2(Activity app, LinearLayout rootView) {
+    public CamBaseV2(Activity app, RelativeLayout rootView) {
         mApp = app;
-        mRootView = rootView;
+        this.rootView = rootView;
     }
 
-    public CamBaseV2(Context context, LinearLayout rootView) {
+    public CamBaseV2(Context context, RelativeLayout rootView) {
         this.context = context;
-        mRootView = rootView;
+        this.rootView = rootView;
     }
 
     public void onActivityResume() {
@@ -118,7 +118,7 @@ public class CamBaseV2 {
 
     private void releaseSurfaceView() {
         if (mPreviewSurface != null) {
-            mRootView.removeView(mPreviewSurfaceView);
+            rootView.removeView(mPreviewSurfaceView);
             mPreviewSurfaceTexture = null;
             mPreviewSurface = null;
         }
@@ -133,7 +133,7 @@ public class CamBaseV2 {
 
             // Because camera2.0 only can control view size.
             // So we need to dynamic create view to fit sensor size.
-            createSurfaceView(mRootView);
+            createSurfaceView(rootView);
             Log.e(LOG_TAG, "camera open begin");
             mCameraManager.openCamera(mCameraId[0], mCameraDeviceStateCallback, mCameraHandler);
         } catch (CameraAccessException | SecurityException e) {
@@ -141,19 +141,20 @@ public class CamBaseV2 {
         }
     }
 
-    private void createSurfaceView(LinearLayout rootLayout) {
+    private void createSurfaceView(RelativeLayout rootLayout) {
         LinearLayout.LayoutParams layoutParams = getPreviewLayoutParams();
 
         Log.d(LOG_TAG, "layoutParams. w: " + layoutParams.width + ", h: " + layoutParams.height);
         Log.d(LOG_TAG, "rotation: " + getDisplayRotation(context));
 
-        mPreviewSize = new Size(layoutParams.width, layoutParams.height);
+//        mPreviewSize = new Size(layoutParams.width, layoutParams.height);
         int displayRotation = getDisplayRotation(context);
         if (displayRotation == 0  || displayRotation == 180) {
             int tmp = layoutParams.width;
             layoutParams.width = layoutParams.height;
             layoutParams.height = tmp;
         }
+
 
         mPreviewSurfaceView = new PreviewGLSurfaceView(context, mPreviewSize);
         mPreviewSurfaceView.setLayoutParams(layoutParams);
@@ -188,31 +189,37 @@ public class CamBaseV2 {
         Log.i(LOG_TAG, "Sensor Orientation angle:" + sensorOrientation);
         Log.i(LOG_TAG, "Sensor Width/Height : " + sensorWidth + "/" + sensorHeight);
         Log.i(LOG_TAG, "Screen Width/Height : " + screenSize.x + "/" + screenSize.y);
-        // Preview's View size must same as sensor ratio.
-//        if (mIsFullDeviceHeight) {
-//            // full device height, maybe 16:9 at phone
-//            previewWidth = screenSize.y * sensorWidth / sensorHeight;
-//            previewHeight = screenSize.y;
-//        } else {
-//            // full device width, maybe 4:3 at phone
-//            previewWidth = screenSize.x;
-//            previewHeight = screenSize.x * sensorHeight / sensorWidth;
-//        }
-        if (screenSize.x > screenSize.y) {
-            previewWidth = screenSize.x;
-            previewHeight = screenSize.y + 8;
-        } else {
-            previewWidth = screenSize.y;
-            previewHeight = screenSize.x + 8;
-        }
+
+        StreamConfigurationMap map = mCameraCharacteristics
+                .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] choices = map.getOutputSizes(SurfaceTexture.class);
+
+        previewWidth = choices[choices.length - 1].getWidth();
+        previewHeight = choices[choices.length - 1].getHeight();
+        mPreviewSize = new Size(previewWidth, previewHeight);
+
         Log.d(LOG_TAG, "previewWidth: " + previewWidth + ", previewHeight: " + previewHeight);
 
         // Set margin to center at screen.
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(previewWidth, previewHeight);
-//        int widthMargin = (previewWidth - screenSize.x) / 2;
-//        int heightMargin = (previewHeight - screenSize.y) / 2;
-//        layoutParams.leftMargin = -widthMargin;
-//        layoutParams.topMargin = -heightMargin;
+        LinearLayout.LayoutParams layoutParams =
+                new LinearLayout.LayoutParams(choices[0].getWidth(), choices[0].getHeight());
+
+        // Preview's View size must same as sensor ratio.
+//        if (screenSize.x < screenSize.y) {
+////            previewWidth = screenSize.x;
+////            previewHeight = screenSize.y + 8;
+//            int widthMargin = (previewWidth - screenSize.y) / 2;
+//            int heightMargin = (previewHeight - screenSize.x) / 2;
+//            layoutParams.leftMargin = -widthMargin;
+//            layoutParams.topMargin = -heightMargin;
+//        } else {
+////            previewWidth = screenSize.y;
+////            previewHeight = screenSize.x + 8;
+//            int widthMargin = (previewWidth - screenSize.x) / 2;
+//            int heightMargin = (previewHeight - screenSize.y) / 2;
+//            layoutParams.leftMargin = -widthMargin;
+//            layoutParams.topMargin = -heightMargin;
+//        }
         return layoutParams;
     }
 

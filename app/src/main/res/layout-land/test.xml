@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentBottom="false"
+    android:background="@color/image_highlight_darking">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/root_view"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seek_view"
+        android:orientation="horizontal"
+        android:padding="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id ="@+id/push_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/button_bg_round"
+            android:padding="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="Name"
+            android:ems="10"
+            android:id="@+id/textView"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/edittext_border"
+            android:layout_marginLeft="19dp"
+            android:layout_marginStart="19dp"
+            android:layout_alignBaseline="@+id/push_button"
+            android:layout_alignBottom="@+id/push_button"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="15"
+            android:progress="5"
+            android:id="@+id/seekBar"
+            android:scrollbarSize="20dp"
+            android:scrollbarStyle="outsideInset"
+            android:paddingEnd="25dp"
+            android:paddingStart="25dip"
+            android:paddingRight="25dp"
+            android:paddingLeft="25dip"
+            android:layout_alignBottom="@+id/textView"
+            android:layout_toLeftOf="@+id/push_button"
+            android:layout_marginRight="89dp"
+            android:layout_marginEnd="89dp"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_toEndOf="@+id/textView" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
