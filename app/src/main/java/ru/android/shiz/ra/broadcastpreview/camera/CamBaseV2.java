@@ -56,14 +56,10 @@ public class CamBaseV2 {
 
     private Context context = null;
 
-    public CamBaseV2(Activity app, RelativeLayout rootView) {
-        mApp = app;
-        this.rootView = rootView;
-    }
-
-    public CamBaseV2(Context context, RelativeLayout rootView) {
+    public CamBaseV2(Context context, RelativeLayout rootView, Size previewSize) {
         this.context = context;
         this.rootView = rootView;
+        this.mPreviewSize = previewSize;
     }
 
     public void onActivityResume() {
@@ -155,7 +151,7 @@ public class CamBaseV2 {
             layoutParams.height = tmp;
         }
 
-
+        Log.d(LOG_TAG,  "preview.width: " + mPreviewSize.getWidth() + ", preview.height: " + mPreviewSize.getHeight());
         mPreviewSurfaceView = new PreviewGLSurfaceView(context, mPreviewSize);
         mPreviewSurfaceView.setLayoutParams(layoutParams);
         mPreviewSurfaceView.setSurfaceTextureListener(mSurfaceextureListener);
@@ -194,11 +190,11 @@ public class CamBaseV2 {
                 .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         Size[] choices = map.getOutputSizes(SurfaceTexture.class);
 
-        previewWidth = choices[choices.length - 1].getWidth();
-        previewHeight = choices[choices.length - 1].getHeight();
-        mPreviewSize = new Size(previewWidth, previewHeight);
+//        previewWidth = choices[choices.length - 1].getWidth();
+//        previewHeight = choices[choices.length - 1].getHeight();
+//        mPreviewSize = new Size(previewWidth, previewHeight);
 
-        Log.d(LOG_TAG, "previewWidth: " + previewWidth + ", previewHeight: " + previewHeight);
+//        Log.d(LOG_TAG, "previewWidth: " + previewWidth + ", previewHeight: " + previewHeight);
 
         // Set margin to center at screen.
         LinearLayout.LayoutParams layoutParams =

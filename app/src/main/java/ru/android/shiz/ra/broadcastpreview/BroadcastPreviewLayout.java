@@ -57,26 +57,12 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
         super.onFinishInflate();
         ButterKnife.bind(this);
 
-        camBaseV2 = new CamBaseV2(context, rootView);
         getCameraResolutions();
+        camBaseV2 = new CamBaseV2(context, rootView, choices[0]);
         int seekBarMax = choices.length - 1;
         seekBar.setMax(seekBarMax);
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                textView.setText(getResolutionStr(progress));
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-        seekBar.setProgress(0);
     }
 
     private String getResolutionStr(int number) {
@@ -119,6 +105,26 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 //            textureView.setSurfaceTextureListener(surfaceTextureListener);
 //        }
 
-        camBaseV2.onActivityResume();
+//        camBaseV2.onActivityResume();
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d(LOG_TAG, "onProgressChanged: " + progress);
+                textView.setText(getResolutionStr(progress));
+                camBaseV2.onActivityPause();
+                camBaseV2 = new CamBaseV2(context, rootView, choices[progress]);
+                camBaseV2.onActivityResume();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        seekBar.setProgress(0);
     }
 }
