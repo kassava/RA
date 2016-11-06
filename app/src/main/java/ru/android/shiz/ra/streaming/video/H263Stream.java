@@ -24,6 +24,7 @@
 package ru.android.shiz.ra.streaming.video;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import ru.android.shiz.ra.streaming.SessionBuilder;
 import ru.android.shiz.ra.streaming.rtp.H263Packetizer;
@@ -66,8 +67,8 @@ public class H263Stream extends VideoStream {
      * Starts the stream.
      */
     public synchronized void start() throws IllegalStateException, IOException {
-        configure();
         if (!mStreaming) {
+            configure();
             super.start();
         }
     }

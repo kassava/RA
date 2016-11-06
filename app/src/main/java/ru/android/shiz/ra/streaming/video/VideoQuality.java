@@ -72,8 +72,8 @@ public class VideoQuality {
 
     public boolean equals(VideoQuality quality) {
         if (quality==null) return false;
-        return (quality.resX == this.resX 				&
-                quality.resY == this.resY 				&
+        return (quality.resX == this.resX 			&
+                quality.resY == this.resY 			&
                 quality.framerate == this.framerate	&
                 quality.bitrate == this.bitrate);
     }
@@ -95,6 +95,10 @@ public class VideoQuality {
             catch (IndexOutOfBoundsException ignore) {}
         }
         return quality;
+    }
+
+    public String toString() {
+        return resX+"x"+resY+" px, "+framerate+" fps, "+bitrate/1000+" kbps";
     }
 
     /**
@@ -130,6 +134,7 @@ public class VideoQuality {
         List<int[]> supportedFpsRanges = parameters.getSupportedPreviewFpsRange();
         for (Iterator<int[]> it = supportedFpsRanges.iterator(); it.hasNext();) {
             int[] interval = it.next();
+            // Intervals are returned as integers, for example "29970" means "29.970" FPS.
             supportedFpsRangesStr += interval[0]/1000+"-"+interval[1]/1000+"fps"+(it.hasNext()?", ":"");
             if (interval[1]>maxFps[1] || (interval[0]>maxFps[0] && interval[1]==maxFps[1])) {
                 maxFps = interval;
@@ -139,4 +144,13 @@ public class VideoQuality {
         return maxFps;
     }
 
+    public static String determineSupportedFocuses(Camera.Parameters parameters) {
+        List<String> focusModes = parameters.getSupportedFocusModes();
+        Log.d(TAG, focusModes.toString());
+
+        if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+            return Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO;
+        }
+        return Camera.Parameters.FLASH_MODE_AUTO;
+    }
 }

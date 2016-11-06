@@ -123,8 +123,8 @@ public class AACStream extends AudioStream {
 
     @Override
     public synchronized void start() throws IllegalStateException, IOException {
-        configure();
         if (!mStreaming) {
+            configure();
             super.start();
         }
     }
@@ -151,8 +151,9 @@ public class AACStream extends AudioStream {
             } else {
                 mPacketizer = new AACLATMPacketizer();
             }
+            mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
+            mPacketizer.getRtpSocket().setOutputStream(mOutputStream, mChannelIdentifier);
         }
-
 
         if (mMode == MODE_MEDIARECORDER_API) {
 
@@ -172,7 +173,7 @@ public class AACStream extends AudioStream {
 
             mProfile = 2; // AAC LC
             mChannel = 1;
-            mConfig = mProfile<<11 | mSamplingRateIndex<<7 | mChannel<<3;
+            mConfig = (mProfile & 0x1F) << 11 | (mSamplingRateIndex & 0x0F) << 7 | (mChannel & 0x0F) << 3;
 
             mSessionDescription = "m=audio "+String.valueOf(getDestinationPorts()[0])+" RTP/AVP 96\r\n" +
                     "a=rtpmap:96 mpeg4-generic/"+mQuality.samplingRate+"\r\n"+
@@ -226,7 +227,7 @@ public class AACStream extends AudioStream {
                             if (len ==  AudioRecord.ERROR_INVALID_OPERATION || len == AudioRecord.ERROR_BAD_VALUE) {
                                 Log.e(TAG,"An error occured with the AudioRecord API !");
                             } else {
-                                //Log.v(LOG_TAG,"Pushing raw audio to the decoder: len="+len+" bs: "+inputBuffers[bufferIndex].capacity());
+                                //Log.v(TAG,"Pushing raw audio to the decoder: len="+len+" bs: "+inputBuffers[bufferIndex].capacity());
                                 mMediaCodec.queueInputBuffer(bufferIndex, 0, len, System.nanoTime()/1000, 0);
                             }
                         }
@@ -240,7 +241,6 @@ public class AACStream extends AudioStream {
         mThread.start();
 
         // The packetizer encapsulates this stream in an RTP stream and send it over the network
-        mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
         mPacketizer.setInputStream(inputStream);
         mPacketizer.start();
 
@@ -354,7 +354,7 @@ public class AACStream extends AudioStream {
         mQuality.samplingRate = AUDIO_SAMPLING_RATES[mSamplingRateIndex];
 
         // 5 bits for the object type / 4 bits for the sampling rate / 4 bits for the channel / padding
-        mConfig = mProfile<<11 | mSamplingRateIndex<<7 | mChannel<<3;
+        mConfig = (mProfile & 0x1F) << 11 | (mSamplingRateIndex & 0x0F) << 7 | (mChannel & 0x0F) << 3;
 
         Log.i(TAG,"MPEG VERSION: " + ( (buffer[0]&0x08) >> 3 ) );
         Log.i(TAG,"PROTECTION: " + (buffer[0]&0x01) );

@@ -30,7 +30,7 @@ import android.util.Log;
  *
  *   AMR Streaming over RTP.
  *
- *   Must be fed with an InputStream containing raw amr nb
+ *   Must be fed with an InputStream containing raw AMR NB
  *   Stream must begin with a 6 bytes long header: "#!AMR\n", it will be skipped
  *
  */
@@ -78,7 +78,7 @@ public class AMRNBPacketizer extends AbstractPacketizer implements Runnable {
 
         try {
 
-            // Skip raw amr header
+            // Skip raw AMR header
             fill(header,0,AMR_HEADER_LENGTH);
 
             if (header[5] != '\n') {
@@ -101,7 +101,7 @@ public class AMRNBPacketizer extends AbstractPacketizer implements Runnable {
                 // And we read the payload
                 fill(buffer, rtphl+2,frameLength);
 
-                //Log.d(LOG_TAG,"Frame length: "+frameLength+" frameType: "+frameType);
+                //Log.d(TAG,"Frame length: "+frameLength+" frameType: "+frameType);
 
                 // RFC 3267 Page 14: "For AMR, the sampling frequency is 8 kHz"
                 // FIXME: Is this really always the case ??
@@ -109,7 +109,7 @@ public class AMRNBPacketizer extends AbstractPacketizer implements Runnable {
                 socket.updateTimestamp(ts);
                 socket.markNextPacket();
 
-                //Log.d(LOG_TAG,"expected: "+ expected + " measured: "+measured);
+                //Log.d(TAG,"expected: "+ expected + " measured: "+measured);
 
                 send(rtphl+1+AMR_FRAME_HEADER_LENGTH+frameLength);
 

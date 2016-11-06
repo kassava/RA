@@ -88,7 +88,7 @@ public class AACLATMPacketizer extends AbstractPacketizer implements Runnable {
                 if (length>0) {
 
                     bufferInfo = ((MediaCodecInputStream)is).getLastBufferInfo();
-                    //Log.d(LOG_TAG,"length: "+length+" ts: "+bufferInfo.presentationTimeUs);
+                    //Log.d(TAG,"length: "+length+" ts: "+bufferInfo.presentationTimeUs);
                     oldts = ts;
                     ts = bufferInfo.presentationTimeUs*1000;
 

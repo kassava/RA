@@ -22,6 +22,7 @@ package ru.android.shiz.ra.streaming.exceptions;
 
         import java.io.IOException;
 
+
 public class StorageUnavailableException extends IOException {
 
     public StorageUnavailableException(String message) {

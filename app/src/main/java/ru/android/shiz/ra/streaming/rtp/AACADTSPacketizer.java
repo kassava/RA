@@ -82,7 +82,7 @@ public class AACADTSPacketizer extends AbstractPacketizer implements Runnable {
         // marker bit in the RTP header is 1 on the last fragment of an Access
         // Unit, and 0 on all other fragments." RFC 3640
 
-        // Adts header fields that we need to parse
+        // ADTS header fields that we need to parse
         boolean protection;
         int frameLength, sum, length, nbau, nbpk, samplingRateIndex, profile;
         long oldtime = SystemClock.elapsedRealtime(), now = oldtime;
@@ -124,7 +124,7 @@ public class AACADTSPacketizer extends AbstractPacketizer implements Runnable {
                 // We update the RTP timestamp
                 ts +=  1024L*1000000000L/samplingRate; //stats.average();
 
-                //Log.d(LOG_TAG,"frameLength: "+frameLength+" protection: "+protection+" p: "+profile+" sr: "+samplingRate);
+                //Log.d(TAG,"frameLength: "+frameLength+" protection: "+protection+" p: "+profile+" sr: "+samplingRate);
 
                 sum = 0;
                 while (sum<frameLength) {

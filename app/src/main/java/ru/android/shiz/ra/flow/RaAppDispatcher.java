@@ -65,7 +65,7 @@ final public class RaAppDispatcher implements Dispatcher {
                 layout = R.layout.screen_broadcast_details;
             } else {
                 if (destination instanceof BroadcastPreviewScreen) {
-                    layout = R.layout.screen_broadcast_preview;
+                    layout = R.layout.screen_old_camera;
                 } else {
                     throw new AssertionError("Unrecognized screen " + destination);
                 }

@@ -55,7 +55,7 @@ public class MP4Config {
     }
 
     /**
-     * Finds sps & pps parameters inside a .mp4.
+     * Finds SPS & PPS parameters inside a .mp4.
      * @param path Path to the file to analyze
      * @throws IOException
      * @throws FileNotFoundException
@@ -64,12 +64,9 @@ public class MP4Config {
 
         StsdBox stsdBox;
 
-        // We open the mp4 file
-        mp4Parser = new MP4Parser(path);
-
-        // We parse it
+        // We open the mp4 file and parse it
         try {
-            mp4Parser.parse();
+            mp4Parser = MP4Parser.parse(path);
         } catch (IOException ignore) {
             // Maybe enough of the file has been parsed and we can get the stsd box
         }
@@ -80,7 +77,6 @@ public class MP4Config {
         mSPS = stsdBox.getB64SPS();
         mProfilLevel = stsdBox.getProfileLevel();
 
-        // We're done !
         mp4Parser.close();
 
     }

@@ -96,7 +96,7 @@ public class H263Packetizer extends AbstractPacketizer implements Runnable {
                 }
                 // Parse temporal reference
                 tr = (buffer[i+2]&0x03)<<6 | (buffer[i+3]&0xFF)>>2;
-                //Log.d(LOG_TAG,"j: "+j+" buffer: "+printBuffer(rtphl, rtphl+5)+" tr: "+tr);
+                //Log.d(TAG,"j: "+j+" buffer: "+printBuffer(rtphl, rtphl+5)+" tr: "+tr);
                 if (firstFragment) {
                     // This is the first fragment of the frame -> header is set to 0x0400
                     buffer[rtphl] = 4;
@@ -108,7 +108,7 @@ public class H263Packetizer extends AbstractPacketizer implements Runnable {
                     // We have found the end of the frame
                     stats.push(duration);
                     ts+= stats.average(); duration = 0;
-                    //Log.d(LOG_TAG,"End of frame ! duration: "+stats.average());
+                    //Log.d(TAG,"End of frame ! duration: "+stats.average());
                     // The last fragment of a frame has to be marked
                     socket.markNextPacket();
                     send(j);
