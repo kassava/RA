@@ -27,6 +27,7 @@ import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RaApp;
 import ru.android.shiz.ra.streaming.SessionBuilder;
 import ru.android.shiz.ra.streaming.video.VideoQuality;
+import ru.android.shiz.ra.streaming.video.VideoStream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -244,6 +245,11 @@ public class RequestHandler {
                 int current = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
                 response.append("{\"max\":"+max+",\"current\":"+current+"}");
             }
+        }
+
+        // Returns bitrate value.
+        else if (action.equals("bitrate")) {
+            response.append("\"" + application.videoQuality.bitrate + "\"");
         }
 
     }

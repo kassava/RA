@@ -113,6 +113,22 @@
             );
         },100000);
     }
+	
+	function updateBitrateValue(data) {
+		$('#bitrate>#value').text(data.bitrate);
+		
+		setTimeout(function () {
+			sendRequest(
+				[{"action":"bitrate"}],
+				function (e) {
+					updateBitrateValue(e);
+				},
+				function () {
+					updateBitrateValue({bitrate:'??'});
+				}
+			);
+		}, 5000);
+	}
 
     function updateTooltip(title) {
 	     $('#tooltip>div').hide();
@@ -429,7 +445,7 @@
 
         testVlcPlugin();
 
-        sendRequest([{'action':'sounds'},{'action':'screen'},{'action':'get'},{'action':'battery'},{'action':'volume'}], function (data) {
+        sendRequest([{'action':'sounds'},{'action':'screen'},{'action':'get'},{'action':'battery'},{'action':'volume'},{'action':'bitrate'}], function (data) {
 
 	         // Verifies that the screen is not turned off
 	         testScreenState(data.screen);
@@ -442,6 +458,9 @@
 
             // Retrieves volume and battery level
             updatePhoneStatus(data);
+			
+			// Retrieves bitrate value
+			updateBitrateValue(data);
             
         });
 

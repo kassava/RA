@@ -36,7 +36,6 @@
 <div id="background"></div>
 
 <header>
-    <img src="images/spydroid.png" alt="Spydroid"></img>
 </header>
 
 <section>
@@ -62,24 +61,23 @@
             <div id="volume">?</div>
             <div id="minus"><a>-</a></div>
         </div>
-        <div id="fullscreen"><a>Fullscreen</a></div>
-        <div id="battery"><span>Battery</span>: <span id="level">100</span>%</div>
+			<div id="fullscreen"><a>Fullscreen</a></div>
+        	<div id="battery"><span>Battery</span>: <span id="level">100</span>%</div>
+			<div id="bitrate"><span>Bitrate</span>: <span id="value">0</span> b/s</div>
     </div>
-
-    <div id="right-bar">
 
         <!-- Accordion -->
         <div class="accordion">
 
             <!-- Section 1 -->
-            <div class="section" id="quality">
+            <div class="section" id="quality">-
                 <div class="title"><h1>Change quality settings</h1></div>
                 <div class="section-content">
 
                     <!-- AUDIO CONFIG  -->
                     <div class="block audio">
                         <div class="checkbox-group">
-                            <label><input type="checkbox" checked="false" id="audioEnabled"></input><span>Stream sound</span></label>
+                            <label><input type="checkbox" checked="true" id="audioEnabled"></input><span>Stream sound</span></label>
                         </div>
                         <div class="select-group">
                             <label><span>Encoder</span> : </label>
