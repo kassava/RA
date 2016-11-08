@@ -114,17 +114,17 @@
         },100000);
     }
 	
-	function updateBitrateValue(data) {
-		$('#bitrate>#value').text(data.bitrate);
+	function updateServerBitrateValue(data) {
+		$('#serverbitrate>#value').text(data.serverbitrate);
 		
 		setTimeout(function () {
 			sendRequest(
-				[{"action":"bitrate"}],
+				[{"action":"serverbitrate"}],
 				function (e) {
 					updateBitrateValue(e);
 				},
 				function () {
-					updateBitrateValue({bitrate:'??'});
+					updateServerBitrateValue({serverbitrate:'??'});
 				}
 			);
 		}, 5000);
@@ -460,7 +460,7 @@
             updatePhoneStatus(data);
 			
 			// Retrieves bitrate value
-			updateBitrateValue(data);
+			updateServerBitrateValue(data);
             
         });
 

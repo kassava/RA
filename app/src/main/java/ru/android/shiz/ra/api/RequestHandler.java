@@ -248,7 +248,7 @@ public class RequestHandler {
         }
 
         // Returns bitrate value.
-        else if (action.equals("bitrate")) {
+        else if (action.equals("serverbitrate")) {
             response.append("\"" + application.videoQuality.bitrate + "\"");
         }
 
