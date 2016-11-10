@@ -63,6 +63,9 @@ public class AudioQuality {
                 quality.samplingRate = Integer.parseInt(config[1]);
             }
             catch (IndexOutOfBoundsException ignore) {}
+            catch (NumberFormatException ignore) {
+                // using default
+            }
         }
         return quality;
     }

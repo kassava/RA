@@ -22,6 +22,7 @@ package ru.android.shiz.ra.streaming.audio;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
 
 import ru.android.shiz.ra.streaming.SessionBuilder;
 import ru.android.shiz.ra.streaming.rtp.AMRNBPacketizer;
