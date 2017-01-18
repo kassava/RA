@@ -13,6 +13,8 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -27,10 +29,13 @@ import android.widget.TextView;
 
 import com.hannesdorfmann.mosby.mvp.layout.MvpFrameLayout;
 
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.android.shiz.ra.R;
 import ru.android.shiz.ra.RaApp;
+import ru.android.shiz.ra.Utilities;
 import ru.android.shiz.ra.api.CustomHttpServer;
 import ru.android.shiz.ra.api.CustomRtspServer;
 import ru.android.shiz.ra.broadcastpreview.camera.CamBaseV2;
@@ -61,6 +66,8 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
     private Context context;
     Size[] choices;
     @BindView(R.id.handset_camera_view) SurfaceView surfaceView;
+    @BindView(R.id.httpaddress) TextView httpAddressTextView;
+    @BindView(R.id.rtspaddress) TextView rtspAddressTextView;
 
     public BroadcastPreviewLayout(Context ctx, AttributeSet attributeSet) {
         super(ctx, attributeSet);
@@ -91,6 +98,29 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
 
         // Starts the service of the RTSP server
         context.startService(new Intent(context, CustomRtspServer.class));
+    }
+
+    private void displayIpAddress() {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        String ipaddress = null;
+        if (info != null && info.getNetworkId() > -1) {
+            int i = info.getIpAddress();
+            String ip = String.format(Locale.ENGLISH,"%d.%d.%d.%d", i & 0xff, i >> 8 & 0xff, i >> 16 & 0xff, i >> 24 & 0xff);
+            httpAddressTextView.setText(httpServer.isHttpsEnabled() ? "https://":"http://");
+            httpAddressTextView.append(ip);
+            httpAddressTextView.append(":" + httpServer.getHttpPort());
+            rtspAddressTextView.setText("rtsp://");
+            rtspAddressTextView.append(ip);
+            rtspAddressTextView.append(":" + rtspServer.getPort());
+        } else if((ipaddress = Utilities.getLocalIpAddress(true)) != null) {
+            httpAddressTextView.setText(httpServer.isHttpsEnabled()?"https://":"http://");
+            httpAddressTextView.append(ipaddress);
+            httpAddressTextView.append(":" + httpServer.getHttpPort());
+            rtspAddressTextView.setText("rtsp://");
+            rtspAddressTextView.append(ipaddress);
+            rtspAddressTextView.append(":" + rtspServer.getPort());
+        }
     }
 
     private String getResolutionStr(int number) {
@@ -158,6 +188,10 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             rtspServer = (CustomRtspServer) ((RtspServer.LocalBinder) service).getService();
             rtspServer.addCallbackListener(rtspCallbackListener);
             rtspServer.start();
+
+            if (httpServer != null && rtspServer != null) {
+                displayIpAddress();
+            }
         }
 
         @Override
@@ -191,6 +225,10 @@ public class BroadcastPreviewLayout extends MvpFrameLayout<BroadcastPreviewView,
             httpServer = (CustomHttpServer) ((TinyHttpServer.LocalBinder)service).getService();
             httpServer.addCallbackListener(httpCallbackListener);
             httpServer.start();
+
+            if (httpServer != null && rtspServer != null) {
+                displayIpAddress();
+            }
         }
 
         @Override

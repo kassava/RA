@@ -38,6 +38,26 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/preview"
+                android:gravity="center"
+                android:id="@+id/httpaddress"
+                android:textColor="@color/colorAccent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/preview"
+                android:gravity="center"
+                android:id="@+id/rtspaddress"
+                android:textColor="@color/colorAccent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_below="@+id/httpaddress"
+                android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
 

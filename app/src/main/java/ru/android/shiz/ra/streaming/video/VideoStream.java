@@ -346,7 +346,8 @@ public abstract class VideoStream extends MediaStream {
             mMediaRecorder = new MediaRecorder();
             mMediaRecorder.setCamera(mCamera);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setVideoEncoder(mVideoEncoder);
             mMediaRecorder.setPreviewDisplay(mSurfaceView.getHolder().getSurface());
             mMediaRecorder.setVideoSize(mRequestedQuality.resX,mRequestedQuality.resY);
@@ -601,9 +602,12 @@ public abstract class VideoStream extends MediaStream {
                 if (parameters.getFlashMode()!=null) {
                     parameters.setFlashMode(mFlashEnabled?Parameters.FLASH_MODE_TORCH:Parameters.FLASH_MODE_OFF);
                 }
+
+                parameters.setFocusMode(VideoQuality.determineSupportedFocuses(parameters));
                 parameters.setRecordingHint(true);
                 mCamera.setParameters(parameters);
                 mCamera.setDisplayOrientation(mOrientation);
+
 
                 try {
                     if (mMode == MODE_MEDIACODEC_API_2) {

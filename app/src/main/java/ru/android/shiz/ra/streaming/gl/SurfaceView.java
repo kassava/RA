@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import ru.android.shiz.ra.streaming.MediaStream;
 import ru.android.shiz.ra.streaming.video.VideoStream;
 
 /**

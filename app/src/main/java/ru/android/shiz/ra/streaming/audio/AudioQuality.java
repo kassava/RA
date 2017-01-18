@@ -20,6 +20,8 @@
 
 package ru.android.shiz.ra.streaming.audio;
 
+import android.util.Log;
+
 /**
  * A class that represents the quality of an audio stream.
  */

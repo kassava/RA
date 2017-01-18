@@ -54,12 +54,21 @@ public class RaApp extends Application {
         super.onCreate();
         component = ru.android.shiz.ra.dagger.DaggerApplicationComponent.create();
 
+        initializeSession();
+
+        registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    /**
+     * Set desired params for session from shared preferences.
+     */
+    private void initializeSession() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         notificationEnabled = settings.getBoolean("notification_enabled", true);
 
         // On android 3.* AAC ADTS is not supported so we set the default encoder to AMR-NB, on android 4.* AAC is the default encoder
-        audioEncoder = (Integer.parseInt(android.os.Build.VERSION.SDK)<14) ? SessionBuilder.AUDIO_AMRNB : SessionBuilder.AUDIO_AAC;
+        audioEncoder = (Integer.parseInt(android.os.Build.VERSION.SDK) < 14) ? SessionBuilder.AUDIO_AMRNB : SessionBuilder.AUDIO_AAC;
         audioEncoder = Integer.parseInt(settings.getString("audio_encoder", String.valueOf(audioEncoder)));
         videoEncoder = Integer.parseInt(settings.getString("video_encoder", String.valueOf(videoEncoder)));
 
@@ -78,8 +87,6 @@ public class RaApp extends Application {
 
         // Listens to changes of preferences
         settings.registerOnSharedPreferenceChangeListener(mOnSharedPreferenceChangeListener);
-
-        registerReceiver(mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     public static RaApp getInstance() {
@@ -133,7 +140,6 @@ public class RaApp extends Application {
 
         }
     };
-
 
     private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver() {
         @Override
